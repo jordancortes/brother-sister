@@ -21,8 +21,8 @@
 /* GLOBAL VARIABLES */
 Character boy, girl;
 GLint   window_width = 960 , window_height = 640, vertical_move_time = 50;
-GLfloat final_position;
-GLboolean movement_lock = false, boy_down = true;
+GLfloat final_position, movement_range = 1.0;
+GLboolean vertical_movement_lock = false, boy_down = true;
 
 
 /* PROTOTYPES */
@@ -94,6 +94,7 @@ void glcreateWindow(std::string name, int window_width, int window_height)
                            , ( glutGet( GLUT_SCREEN_HEIGHT ) - window_height ) / 2 );
 	glutInitWindowSize( window_width,window_height );
     glutCreateWindow( name.c_str() );
+    gluOrtho2D(0, window_width, 0, window_height);
 }
 
 void drawCharacters()
@@ -123,28 +124,30 @@ void time(int v)
     
     if (boy_down)
     {
-        boy.setY(boy.getY() + 0.1);
-        girl.setY(girl.getY() - 0.1);
+        boy.setY(boy.getY() + boy.getHeight()/movement_range);
+        girl.setY(girl.getY() - girl.getHeight()/movement_range);
         
         if (boy.getY() >= final_position)
         {
             end = true;
             
-            boy.setY(0.8);
-            girl.setY(-1.0);
+            /* TODO: ALINEACION FORZOZA */
+            boy.setY(window_height - boy.getHeight());
+            girl.setY(0.0);
         }
     }
     else if (!boy_down)
     {
-        boy.setY(boy.getY() - 0.1);
-        girl.setY(girl.getY() + 0.1);
+        boy.setY(boy.getY() - boy.getHeight()/movement_range);
+        girl.setY(girl.getY() + girl.getHeight()/movement_range);
         
         if (boy.getY() <= final_position)
         {
             end = true;
             
-            boy.setY(-1.0);
-            girl.setY(0.8);
+            /* TODO: ALINEACION FORZOZA */
+            boy.setY(0.0);
+            girl.setY(window_height - girl.getHeight());
         }
     }
     
@@ -153,7 +156,7 @@ void time(int v)
     if (end)
     {
         final_position = 0.0;
-        movement_lock = false;
+        vertical_movement_lock = false;
         boy_down = !boy_down;
     }
     else
@@ -167,11 +170,10 @@ void keyboard(unsigned char key, int x, int y)
     switch (key) {
         case 'z':
         case 'Z':
-            if (!movement_lock)
+            if (!vertical_movement_lock)
             {
-                std::cout << boy.getY() << "\n";
                 final_position = girl.getY();
-                movement_lock = true;
+                vertical_movement_lock = true;
                 glutTimerFunc(vertical_move_time,time, 1);
             }
             break;
@@ -182,16 +184,17 @@ void keyboard(unsigned char key, int x, int y)
 
 void movement(int key, int x, int y)
 {
+    /*TODO: IMPLEMENTAR TIMER PARA HACER UN MOVIMIENTO SMOOTH*/
     if (GLUT_KEY_LEFT == key)
     {
-        boy.setX(boy.getX() - 0.05);
-        girl.setX(girl.getX() + 0.05);
+        boy.setX(boy.getX() - boy.getWidth()/movement_range);
+        girl.setX(girl.getX() + girl.getWidth()/movement_range);
         glutPostRedisplay();
     }
     else if (GLUT_KEY_RIGHT == key)
     {
-        boy.setX(boy.getX() + 0.05);
-        girl.setX(girl.getX() - 0.05);
+        boy.setX(boy.getX() + boy.getWidth()/movement_range);
+        girl.setX(girl.getX() - girl.getWidth()/movement_range);
         glutPostRedisplay();
     }
 }
@@ -208,8 +211,9 @@ void display()
 void init()
 {
     glChangeBackgroundColorHEX(100, 100, 100, 1.0);
-    boy = Character(0.0, -1.0, 0.1, 0.2);
-    girl = Character(0.0, 0.8, 0.1, 0.2);
+    boy = Character(window_width/2, 0.0, 40.0, 50.0);
+    girl = Character(window_width/2, 0.0, 40.0, 50.0);
+    girl.setY(window_height - girl.getHeight());
 }
 
 int main(int argc, char **argv)
