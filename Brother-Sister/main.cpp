@@ -127,6 +127,30 @@ void drawCharacters()
     glPopMatrix();
 }
 
+void checkCollision()
+{
+    /* Paredes laterales */
+    if (boy.getX() < 0)
+    {
+        boy.setX(0.0);
+    }
+    
+    if (boy.getX() + boy.getWidth() > window_width)
+    {
+        boy.setX(window_width - boy.getWidth());
+    }
+    
+    if (girl.getX() < 0)
+    {
+        girl.setX(0.0);
+    }
+    
+    if (girl.getX() + girl.getWidth() > window_width)
+    {
+        girl.setX(window_width - girl.getWidth());
+    }
+}
+
 void time(int v)
 {
     GLboolean end = false;
@@ -198,12 +222,14 @@ void movement(int key, int x, int y)
     {
         boy.setX(boy.getX() - boy.getWidth()/movement_range);
         girl.setX(girl.getX() + girl.getWidth()/movement_range);
+        checkCollision();
         glutPostRedisplay();
     }
     else if (GLUT_KEY_RIGHT == key)
     {
         boy.setX(boy.getX() + boy.getWidth()/movement_range);
         girl.setX(girl.getX() - girl.getWidth()/movement_range);
+        checkCollision();
         glutPostRedisplay();
     }
 }
