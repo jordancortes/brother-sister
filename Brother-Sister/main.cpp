@@ -19,10 +19,19 @@
 #include "Character.h"
 
 /* GLOBAL VARIABLES */
-Character boy, girl;
-GLint   window_width = 960 , window_height = 640, vertical_move_time = 50;
-GLfloat final_position, movement_range = 1.0;
-GLboolean vertical_movement_lock = false, boy_down = true;
+Character     boy
+            , girl;
+
+GLint         window_width = 960
+            , window_height = 640
+            , vertical_move_time = 50;
+
+GLfloat       final_position
+            , movement_range = 1.0;
+
+GLboolean     vertical_movement_lock = false
+            , horizontal_movement_lock = false
+            , boy_down = true;
 
 
 /* PROTOTYPES */
