@@ -27,10 +27,10 @@ GLint         window_width = 960
             , vertical_move_time = 50;
 
 GLfloat       final_position
-            , movement_range = 1.0;
+            , movement_range = 5.0
+            , movement_speed = 10.0;
 
 GLboolean     vertical_movement_lock = false
-            , horizontal_movement_lock = false
             , boy_down = true;
 
 
@@ -40,7 +40,9 @@ void glChangeColorHEX(int red, int green, int blue);
 void glcreateWindow(std::string name, int window_width, int window_height);
 void drawCharacters();
 void movement(int key, int x, int y);
-void time(int v);
+void timeMoveHorizontalLeft(int v);
+void timeMoveHorizontalRight(int v);
+void timeMoveVertical(int v);
 void keyboard(unsigned char key, int x, int y);
 void display();
 void init();
@@ -151,7 +153,31 @@ void checkCollision()
     }
 }
 
-void time(int v)
+void timeMoveHorizontalRight(int v)
+{
+    if (v >= 0)
+    {
+        boy.setX(boy.getX() + 1);
+        girl.setX(girl.getX() - 1);
+        checkCollision();
+        glutPostRedisplay();
+        glutTimerFunc(movement_speed, timeMoveHorizontalRight, --v);
+    }
+}
+
+void timeMoveHorizontalLeft(int v)
+{
+    if (v >= 0)
+    {
+        boy.setX(boy.getX() - 1);
+        girl.setX(girl.getX() + 1);
+        checkCollision();
+        glutPostRedisplay();
+        glutTimerFunc(movement_speed, timeMoveHorizontalLeft, --v);
+    }
+}
+
+void timeMoveVertical(int v)
 {
     GLboolean end = false;
     
@@ -194,7 +220,7 @@ void time(int v)
     }
     else
     {
-        glutTimerFunc(vertical_move_time,time,1);
+        glutTimerFunc(vertical_move_time,timeMoveVertical,1);
     }
 }
 
@@ -207,7 +233,7 @@ void keyboard(unsigned char key, int x, int y)
             {
                 final_position = girl.getY();
                 vertical_movement_lock = true;
-                glutTimerFunc(vertical_move_time,time, 1);
+                glutTimerFunc(vertical_move_time,timeMoveVertical, 1);
             }
             break;
         default:
@@ -217,21 +243,16 @@ void keyboard(unsigned char key, int x, int y)
 
 void movement(int key, int x, int y)
 {
-    /*TODO: IMPLEMENTAR TIMER PARA HACER UN MOVIMIENTO SMOOTH*/
-    if (GLUT_KEY_LEFT == key)
-    {
-        boy.setX(boy.getX() - boy.getWidth()/movement_range);
-        girl.setX(girl.getX() + girl.getWidth()/movement_range);
-        checkCollision();
-        glutPostRedisplay();
-    }
-    else if (GLUT_KEY_RIGHT == key)
-    {
-        boy.setX(boy.getX() + boy.getWidth()/movement_range);
-        girl.setX(girl.getX() - girl.getWidth()/movement_range);
-        checkCollision();
-        glutPostRedisplay();
-    }
+        if (GLUT_KEY_LEFT == key)
+        {
+            glutTimerFunc(movement_speed,timeMoveHorizontalLeft,10);
+            glutPostRedisplay();
+        }
+        else if (GLUT_KEY_RIGHT == key)
+        {
+            glutTimerFunc(movement_speed, timeMoveHorizontalRight, 10);
+            glutPostRedisplay();
+        }
 }
 
 void display()
