@@ -27,7 +27,7 @@ GLint         window_width = 960
             , vertical_move_time = 50;
 
 GLfloat       final_position
-            , movement_range = 5.0
+            , movement_range = 3.0
             , movement_speed = 10.0;
 
 GLboolean     vertical_movement_lock = false
