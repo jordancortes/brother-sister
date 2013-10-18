@@ -12,6 +12,8 @@ Character::Character()
 {
     x = 0;
     y = 0;
+    width = 0;
+    height = 0;
 }
 
 Character::Character(float x, float y, float width, float height)
