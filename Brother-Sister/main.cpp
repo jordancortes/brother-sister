@@ -17,10 +17,13 @@
 #include <sstream>
 
 #include "Character.h"
+#include "Wall.h"
 
 /* GLOBAL VARIABLES */
 Character     boy
             , girl;
+
+Wall        pared;
 
 GLint         window_width = 960
             , window_height = 640
