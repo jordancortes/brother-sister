@@ -36,6 +36,7 @@ Character     boy
  * 10 - Level 10
  */
 std::list<Wall> walls[11];
+
 unsigned long lists_size[11];
 const int LISTS_COUNT = 11;
 
@@ -733,7 +734,7 @@ void initRendering()
     
     glGenTextures(1, texturesBack); //Make room for our texture
     
-    image = loadBMP("BMP/Nivel2.bmp");
+    image = loadBMP("BMP/Nivel1.bmp");
     loadTexture(image, texturesBack, 0); //cual imagen y en que posicion del arreglo de texturas
     
     delete image;
@@ -756,11 +757,190 @@ void init()
     walls[0].push_back(Wall(0, window_height, window_width, 5));
     
     /** NIVEL 1
-     walls[0].push_back(Wall(900, 10, 10, 10));
-     walls[0].push_back(Wall(300, 102, 102, 102));
-     walls[0].push_back(Wall(400,400,100,100));
-     */
+    walls[0].push_back(Wall(0, 0, 860, 102));
+    walls[0].push_back(Wall(0, 487, 860, 102));
+    walls[0].push_back(Wall(297, 253, 221, 88));
+    **/
     
+    /** NIVEL 2
+    walls[0].push_back(Wall(0, 0, 40, 265));
+    walls[0].push_back(Wall(0, 0, 140, 143));
+    walls[0].push_back(Wall(140, 0, 720, 63));
+    walls[0].push_back(Wall(519, 63, 81, 260));
+    walls[0].push_back(Wall(779, 63, 81, 514));
+    walls[0].push_back(Wall(219, 225, 300, 98));
+    walls[0].push_back(Wall(0, 265, 340, 312));
+    walls[0].push_back(Wall(340, 445, 180, 132));
+    walls[0].push_back(Wall(520, 525, 260, 52));
+    **/
+    
+    /** NIVEL 3
+    walls[0].push_back(Wall(0, 0, 40, 577));
+    walls[0].push_back(Wall(40, 0, 820, 58));
+    walls[0].push_back(Wall(343, 58, 141, 260));
+    walls[0].push_back(Wall(484, 58, 120, 130));
+    walls[0].push_back(Wall(819, 58, 41, 519));
+    walls[0].push_back(Wall(40, 340, 59, 90));
+    walls[0].push_back(Wall(99, 116, 121, 314));
+    walls[0].push_back(Wall(220, 116, 44, 202));
+    walls[0].push_back(Wall(220, 402, 513, 28));
+    walls[0].push_back(Wall(692, 252, 41, 150));
+    walls[0].push_back(Wall(643, 252, 49, 66));
+    walls[0].push_back(Wall(301, 430, 130, 43));
+    walls[0].push_back(Wall(719, 485, 100, 40));
+    walls[0].push_back(Wall(39, 525, 780, 52));
+    **/
+    
+    /** NIVEL 4
+    walls[0].push_back(Wall(0, 0, 80, 577));
+    walls[0].push_back(Wall(80, 0, 780, 63));
+    walls[0].push_back(Wall(779, 63, 81, 514));
+    walls[0].push_back(Wall(779, 63, 81, 514));
+    walls[0].push_back(Wall(80, 485, 699, 92));
+    walls[0].push_back(Wall(139, 63, 41, 300));
+    walls[0].push_back(Wall(180, 265, 300, 98));
+    walls[0].push_back(Wall(299, 186, 181, 79));
+    walls[0].push_back(Wall(439, 125, 301, 78));
+    walls[0].push_back(Wall(299, 445, 101, 41));
+    **/
+    
+    /** NIVEL 5
+    walls[0].push_back(Wall(0, 0, 40, 577));
+    walls[0].push_back(Wall(40, 0, 820, 28));
+    walls[0].push_back(Wall(40, 525, 820, 52));
+    walls[0].push_back(Wall(559, 345, 301, 180));
+    walls[0].push_back(Wall(559, 185, 121, 160));
+    walls[0].push_back(Wall(680, 185, 100, 98));
+    walls[0].push_back(Wall(564, 0, 41, 103));
+    walls[0].push_back(Wall(605, 0, 255, 63));
+    walls[0].push_back(Wall(819, 63, 41, 283));
+    walls[0].push_back(Wall(119, 125, 141, 238));
+    walls[0].push_back(Wall(119, 85, 41, 40));
+    walls[0].push_back(Wall(219, 85, 41, 40));
+    walls[0].push_back(Wall(260, 265, 299, 98));
+    walls[0].push_back(Wall(299, 363, 41, 39));
+    walls[0].push_back(Wall(349, 155, 121, 78));
+    **/
+    
+    /** NIVEL 6
+    walls[0].push_back(Wall(0, 0, 40, 577));
+    walls[0].push_back(Wall(40, 445, 260, 132));
+    walls[0].push_back(Wall(40, 0, 260, 63));
+    walls[0].push_back(Wall(259, 125, 41, 320));
+    walls[0].push_back(Wall(300, 265, 40, 98));
+    walls[0].push_back(Wall(99, 265, 160, 98));
+    walls[0].push_back(Wall(219, 125, 40, 140));
+    walls[0].push_back(Wall(139, 125, 80, 78));
+    walls[0].push_back(Wall(299, 0, 260, 16));
+    walls[0].push_back(Wall(559, 0, 301, 103));
+    walls[0].push_back(Wall(299, 525, 460, 52));
+    walls[0].push_back(Wall(759, 103, 101, 474));
+    walls[0].push_back(Wall(639, 485, 120, 40));
+    walls[0].push_back(Wall(519, 485, 41, 40));
+    walls[0].push_back(Wall(639, 425, 61, 60));
+    walls[0].push_back(Wall(639, 265, 120, 58));
+    **/
+    
+    /** NIVEL 7
+    walls[0].push_back(Wall(0, 0, 92, 577));
+    walls[0].push_back(Wall(92, 485, 768, 92));
+    walls[0].push_back(Wall(92, 0, 160, 63));
+    walls[0].push_back(Wall(252, 0, 179, 16));
+    walls[0].push_back(Wall(431, 0, 429, 63));
+    walls[0].push_back(Wall(771, 63, 89, 422));
+    walls[0].push_back(Wall(730, 306, 41, 179));
+    walls[0].push_back(Wall(431, 266, 181, 157));
+    walls[0].push_back(Wall(431, 146, 41, 120));
+    walls[0].push_back(Wall(551, 335, 81, 151));
+    walls[0].push_back(Wall(632, 335, 60, 88));
+    walls[0].push_back(Wall(531, 98, 181, 97));
+    walls[0].push_back(Wall(571, 195, 41, 40));
+    walls[0].push_back(Wall(131, 106, 121, 297));
+    **/
+    
+    /** NIVEL 8
+    walls[0].push_back(Wall(0, 0, 69, 577));
+    walls[0].push_back(Wall(69, 0, 719, 16));
+    walls[0].push_back(Wall(69, 545, 719,32));
+    walls[0].push_back(Wall(788, 0, 72, 577));
+    walls[0].push_back(Wall(69, 106, 100, 77));
+    walls[0].push_back(Wall(128, 183, 41, 60));
+    walls[0].push_back(Wall(169, 146, 180, 57));
+    walls[0].push_back(Wall(308, 106, 41, 40));
+    walls[0].push_back(Wall(428, 395, 41, 151));
+    walls[0].push_back(Wall(348, 395, 80, 88));
+    walls[0].push_back(Wall(348, 246, 41, 149));
+    walls[0].push_back(Wall(268, 246, 281, 57));
+    walls[0].push_back(Wall(388, 106, 41, 140));
+    walls[0].push_back(Wall(175, 366, 121, 97));
+    walls[0].push_back(Wall(521, 366, 121, 97));
+    walls[0].push_back(Wall(648, 106, 140, 117));
+    walls[0].push_back(Wall(468, 106, 180, 77));
+    **/
+    
+    /** NIVEL 9 **/
+    
+    
+    /** NIVEL 10
+    walls[0].push_back(Wall(0, 0, 80, 577));
+    walls[0].push_back(Wall(80, 0, 699, 66));
+    walls[0].push_back(Wall(80, 565, 699, 12));
+    walls[0].push_back(Wall(779, 0, 81, 577));
+    walls[0].push_back(Wall(79, 189, 261, 137));
+    walls[0].push_back(Wall(519, 189, 260, 137));
+    walls[0].push_back(Wall(250, 435, 361, 57));
+    walls[0].push_back(Wall(330, 375, 201, 60));
+    **/
+    
+    
+    
+    
+    /** BASES NIVEL 1
+    walls[0].push_back(Wall(393, 341, 29, 40)); // NIÑO
+    walls[0].push_back(Wall(393, 213, 29, 40)); // NIÑA
+    **/
+    
+    /** BASES NIVEL 2
+    walls[0].push_back(Wall(415, 323, 32, 43)); // NIÑO
+    walls[0].push_back(Wall(415, 182, 32, 43)); // NIÑA
+    **/
+
+    /** BASES NIVEL 3
+    walls[0].push_back(Wall(50, 430, 29, 39)); // NIÑO
+    walls[0].push_back(Wall(50, 301, 29, 39)); // NIÑA
+    **/
+    
+    /** BASES NIVEL 4
+    walls[0].push_back(Wall(225, 363, 31, 42)); // NIÑA
+    walls[0].push_back(Wall(225, 224, 31, 41)); // NIÑO
+    **/
+    
+    /** BASES NIVEL 5
+    walls[0].push_back(Wall(697, 283, 32, 42)); // NIÑA
+    walls[0].push_back(Wall(697, 142, 32, 43)); // NIÑO
+    **/
+    
+    /** BASES NIVEL 6
+    walls[0].push_back(Wall(135, 363, 30, 40)); // NIÑA
+    walls[0].push_back(Wall(135, 225, 30, 40)); // NIÑO
+    **/
+    
+    /** BASES NIVEL 7
+    walls[0].push_back(Wall(648, 423, 29, 40)); // NIÑA
+    walls[0].push_back(Wall(648, 295, 29, 40)); // NIÑO
+    **/
+    
+    /** BASES NIVEL 8
+    walls[0].push_back(Wall(393, 483, 29, 40)); // NIÑO
+    walls[0].push_back(Wall(393, 355, 29, 40)); // NIÑA
+    **/
+    
+    /** BASES NIVEL 9 **/
+
+    /** BASES NIVEL 10
+    walls[0].push_back(Wall(301, 492, 29, 40)); // NIÑO
+    walls[0].push_back(Wall(531, 492, 29, 40)); // NIÑA
+    **/
     
     
     /*
