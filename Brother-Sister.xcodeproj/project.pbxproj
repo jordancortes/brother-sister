@@ -11,6 +11,7 @@
 		17358B1B1809E1E300DB4962 /* Brother_Sister.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 17358B1A1809E1E300DB4962 /* Brother_Sister.1 */; };
 		17358B231809EC9700DB4962 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 17358B211809EC9700DB4962 /* GLUT.framework */; };
 		17358B241809EC9700DB4962 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 17358B221809EC9700DB4962 /* OpenGL.framework */; };
+		173B92C01828C5B0001382B4 /* ImageLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 173B92BF1828C5B0001382B4 /* ImageLoader.cpp */; };
 		175A2017180CDE880034C7EE /* Character.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 175A2015180CDE870034C7EE /* Character.cpp */; };
 		17895E481811BC5700B8D007 /* Wall.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17895E461811BC5700B8D007 /* Wall.cpp */; };
 /* End PBXBuildFile section */
@@ -34,10 +35,12 @@
 		17358B1A1809E1E300DB4962 /* Brother_Sister.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = Brother_Sister.1; sourceTree = "<group>"; };
 		17358B211809EC9700DB4962 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		17358B221809EC9700DB4962 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		173B92BF1828C5B0001382B4 /* ImageLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ImageLoader.cpp; sourceTree = "<group>"; };
 		175A2015180CDE870034C7EE /* Character.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Character.cpp; sourceTree = "<group>"; };
 		175A2016180CDE880034C7EE /* Character.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Character.h; sourceTree = "<group>"; };
 		17895E461811BC5700B8D007 /* Wall.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Wall.cpp; sourceTree = "<group>"; };
 		17895E471811BC5700B8D007 /* Wall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Wall.h; sourceTree = "<group>"; };
+		17B75591182890C100BC33E9 /* ImageLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageLoader.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,8 +77,9 @@
 		17358B171809E1E300DB4962 /* Brother-Sister */ = {
 			isa = PBXGroup;
 			children = (
-				17358B251809ED5000DB4962 /* TextureLoader */,
 				17358B181809E1E300DB4962 /* main.cpp */,
+				173B92BF1828C5B0001382B4 /* ImageLoader.cpp */,
+				17B75591182890C100BC33E9 /* ImageLoader.h */,
 				17895E461811BC5700B8D007 /* Wall.cpp */,
 				17895E471811BC5700B8D007 /* Wall.h */,
 				175A2015180CDE870034C7EE /* Character.cpp */,
@@ -83,13 +87,6 @@
 				17358B1A1809E1E300DB4962 /* Brother_Sister.1 */,
 			);
 			path = "Brother-Sister";
-			sourceTree = "<group>";
-		};
-		17358B251809ED5000DB4962 /* TextureLoader */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = TextureLoader;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -145,6 +142,7 @@
 			files = (
 				17895E481811BC5700B8D007 /* Wall.cpp in Sources */,
 				17358B191809E1E300DB4962 /* main.cpp in Sources */,
+				173B92C01828C5B0001382B4 /* ImageLoader.cpp in Sources */,
 				175A2017180CDE880034C7EE /* Character.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

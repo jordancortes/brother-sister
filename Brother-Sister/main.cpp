@@ -17,6 +17,7 @@
 #include <sstream>
 #include <list>
 
+#include "ImageLoader.h"
 #include "Character.h"
 #include "Wall.h"
 
@@ -37,10 +38,27 @@ Character     boy
 std::list<Wall> walls[11];
 unsigned long lists_size[11];
 const int LISTS_COUNT = 11;
+
+/**
+ * 0 - Intro
+ * 1 - Level 1
+ * 2 - Level 2
+ * 3 - Level 3
+ * 4 - Level 4
+ * 5 - Level 5
+ * 6 - Level 6
+ * 7 - Level 7
+ * 8 - Level 8
+ * 9 - Level 9
+ * 10 - Level 10
+ * 11 - Instructions
+ */
+static GLuint texturesBack[12];
+
 int current_level = 0;
 
-GLint         window_width = 960
-            , window_height = 640
+GLint         window_width = 860
+            , window_height = 575
             , vertical_movement_speed = 1
             , horizontal_movement_speed = 10;
 
@@ -54,19 +72,19 @@ GLboolean     vertical_movement_lock = false
 
 
 /* PROTOTYPES */
-void glChangeBackgroundColorHEX(int red, int green, int blue, float opacity);
-void glChangeColorHEX(int red, int green, int blue);
-void glcreateWindow(std::string name, int window_width, int window_height);
+void glChangeBackgroundColorHEX(int, int, int, float);
+void glChangeColorHEX(int, int, int);
+void glcreateWindow(std::string, int, int);
 void drawCharacters();
 void drawWalls();
-void paintWall(Wall wall);
+void paintWall(Wall);
 void nextListItem(std::list<Wall>& list);
 Wall frontListItem(std::list<Wall>& list);
-void movement(int key, int x, int y);
-void timeMoveHorizontalLeft(int v);
-void timeMoveHorizontalRight(int v);
-void timeMoveVertical(int v);
-void keyboard(unsigned char key, int x, int y);
+void movement(int, int, int);
+void timeMoveHorizontalLeft(int);
+void timeMoveHorizontalRight(int);
+void timeMoveVertical(int);
+void keyboard(unsigned char, int, int);
 void display();
 void init();
 
@@ -369,7 +387,7 @@ void moveCharactersFloating() {
             glutTimerFunc(vertical_movement_speed,timeMoveVertical, 1);
         }
     }
-    
+    //TODO cuando ambos quedan flotando al mismo tiempo
     if (characterIsFloating(girl, walls[current_level]))
     {
         if (!vertical_movement_lock)
@@ -448,6 +466,8 @@ void timeMoveVertical(int v)
                 {
                     vertical_movement_lock = false;
                 }
+                
+                glutPostRedisplay();
             }
         }
         else //si va para abajo
@@ -469,11 +489,13 @@ void timeMoveVertical(int v)
                 {
                     vertical_movement_lock = false;
                 }
+                
+                glutPostRedisplay();
             }
         }
     }
     
-    if (girl_vertical_move)  //si se debe de mover el niño
+    if (girl_vertical_move)  //si se debe de mover la niña
     {
         float girl_diff_collision;
         
@@ -496,6 +518,8 @@ void timeMoveVertical(int v)
                 {
                     vertical_movement_lock = false;
                 }
+                
+                glutPostRedisplay();
             }
         }
         else //si va para abajo
@@ -517,6 +541,8 @@ void timeMoveVertical(int v)
                 {
                     vertical_movement_lock = false;
                 }
+                
+                glutPostRedisplay();
             }
         }
     }
@@ -597,6 +623,21 @@ void movement(int key, int x, int y)
  ******************            INICIO DE PINTADO           *****************
  ***************************************************************************/
 
+void loadTexture(Image* image, GLuint txtName[], int k)
+{
+    glBindTexture(GL_TEXTURE_2D, txtName[k]);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height, 0, GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+}
+
 void drawCharacters()
 {
     glPushMatrix();
@@ -643,6 +684,22 @@ void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+    //Fondo
+    glEnable(GL_TEXTURE_2D);
+    
+    glBindTexture(GL_TEXTURE_2D, texturesBack[0]);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex2f(0, 0);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex2f(1024, 0);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex2f(1024, 1024);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex2f(0, 1024);
+    glEnd();
+    
+    
     drawCharacters();
     
     drawWalls(walls[current_level]);
@@ -658,16 +715,38 @@ void display()
 
 
 
+void handleResize(int w, int h)
+{
+    glViewport(0, 0, w, h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    //gluPerspective(69.0, (float)w / (float)h, 1.0, 20.0);
+    //glMatrixMode(GL_MODELVIEW);
+    //glLoadIdentity();
+}
 
-
-
+void initRendering()
+{
+    Image* image;
+    
+    glEnable(GL_TEXTURE_2D);
+    
+    glGenTextures(1, texturesBack); //Make room for our texture
+    
+    image = loadBMP("BMP/Nivel2.bmp");
+    loadTexture(image, texturesBack, 0); //cual imagen y en que posicion del arreglo de texturas
+    
+    delete image;
+}
 
 void init()
 {
     glChangeBackgroundColorHEX(100, 100, 100, 1.0);
     
-    boy = Character(window_width/2, 0.0, 40.0, 50.0);
-    girl = Character(window_width/2, 0.0, 40.0, 50.0);
+    //boy = Character(window_width/2, 0.0, 40.0, 50.0);
+    boy = Character(10000, 0.0, 40.0, 50.0);
+    //girl = Character(window_width/2, 0.0, 40.0, 50.0);
+    girl = Character(10000, 0.0, 40.0, 50.0);
     girl.setY(window_height - girl.getHeight());
     
     //Inicialización de paredes externas
@@ -676,8 +755,13 @@ void init()
     walls[0].push_back(Wall(0,-5,window_width, 5));
     walls[0].push_back(Wall(0, window_height, window_width, 5));
     
-    walls[0].push_back(Wall(900, 10, 10, 10));
-    walls[0].push_back(Wall(300, 102, 102, 102));
+    /** NIVEL 1
+     walls[0].push_back(Wall(900, 10, 10, 10));
+     walls[0].push_back(Wall(300, 102, 102, 102));
+     walls[0].push_back(Wall(400,400,100,100));
+     */
+    
+    
     
     /*
      * Determinacion de cantidad de paredes por lista (no se deben declarar
@@ -687,10 +771,18 @@ void init()
     {
         lists_size[x] = walls[x].size();
     }
+    
+    initRendering();
 }
+
+#include <unistd.h>
 
 int main(int argc, char **argv)
 {
+    char path[1024];
+    getcwd(path, sizeof(path));
+    puts(path);
+    
     glutInit(&argc, argv);
     
     glcreateWindow("Brother&Sister", window_width, window_height);
@@ -698,6 +790,7 @@ int main(int argc, char **argv)
     init();
     
     glutDisplayFunc(display);
+    glutReshapeFunc(handleResize);
     glutSpecialFunc(movement);
     glutKeyboardFunc(keyboard);
     glutMainLoop();
