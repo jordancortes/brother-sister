@@ -1363,13 +1363,13 @@ void display()
     
     drawCharacters();
     
-    drawWalls(walls[current_level]);
+   // drawWalls(walls[current_level]);
     
     drawSpikes(spikes[current_level]);
     
     drawButtonDoors(buttons[current_level]);
     
-    drawGoals();
+   // drawGoals();
     
     glutSwapBuffers();
 }
@@ -1457,7 +1457,7 @@ void init()
     walls[1].push_back(Block(0, 0, 860, 102));
     walls[1].push_back(Block(0, 487, 860, 102));
     walls[1].push_back(Block(297, 253, 221, 88));
-    
+
     /** NIVEL 2 **/
     walls[2].push_back(Block(0, 0, 40, 265));
     walls[2].push_back(Block(0, 0, 140, 143));
@@ -1468,7 +1468,7 @@ void init()
     walls[2].push_back(Block(0, 265, 340, 312));
     walls[2].push_back(Block(340, 445, 180, 132));
     walls[2].push_back(Block(520, 525, 260, 52));
-    
+
     buttons[2] = Button(551, 323, 32, 8);
     buttons[2].addDoor(Block(300, 63, 32, 162, 1, 1.0, 2.53125));
     
@@ -1494,19 +1494,53 @@ void init()
     /** NIVEL 4 **/
     walls[4].push_back(Block(0, 0, 80, 577));
     walls[4].push_back(Block(80, 0, 780, 63));
-    walls[4].push_back(Block(779, 63, 81, 514));
-    walls[4].push_back(Block(779, 63, 81, 514));
-    walls[4].push_back(Block(80, 485, 699, 92));
+    walls[4].push_back(Block(780, 63, 81, 514));
+    walls[4].push_back(Block(80, 485, 702, 92));
     walls[4].push_back(Block(139, 63, 41, 300));
     walls[4].push_back(Block(180, 265, 300, 98));
     walls[4].push_back(Block(299, 186, 181, 79));
-    walls[4].push_back(Block(439, 125, 301, 78));
+    walls[4].push_back(Block(439, 125, 300, 78));
     walls[4].push_back(Block(299, 445, 101, 41));
+     
+    spikes[4].push_back(Block(442, 363, 16, 16, 1));
+    spikes[4].push_back(Block(458, 363, 16, 16, 1));
     
-    spikes[4].push_back(Block(448, 363, 16, 16, 1));
-    spikes[4].push_back(Block(464, 363, 16, 16, 1));
+    spikes[4].push_back(Block(145, 363, 16, 16, 1));
+    spikes[4].push_back(Block(161, 363, 16, 16, 1));
     
-    buttons[4] = Button(551, 323, 32, 8);
+    spikes[4].push_back(Block(400, 470, 16, 16, 3));
+    spikes[4].push_back(Block(416, 470, 16, 16, 3));
+   
+    spikes[4].push_back(Block(536, 470, 16, 16, 3));
+    spikes[4].push_back(Block(552, 470, 16, 16, 3));
+    spikes[4].push_back(Block(568, 470, 16, 16, 3));
+    spikes[4].push_back(Block(584, 470, 16, 16, 3));
+    spikes[4].push_back(Block(600, 470, 16, 16, 3));
+    spikes[4].push_back(Block(616, 470, 16, 16, 3));
+    spikes[4].push_back(Block(632, 470, 16, 16, 3));
+    spikes[4].push_back(Block(648, 470, 16, 16, 3));
+    spikes[4].push_back(Block(664, 470, 16, 16, 3));
+    spikes[4].push_back(Block(680, 470, 16, 16, 3));
+
+    spikes[4].push_back(Block(480, 202, 16, 16, 1));
+    spikes[4].push_back(Block(496, 202, 16, 16, 1));
+    spikes[4].push_back(Block(512, 202, 16, 16, 1));
+    spikes[4].push_back(Block(528, 202, 16, 16, 1));
+    spikes[4].push_back(Block(544, 202, 16, 16, 1));
+
+    spikes[4].push_back(Block(654, 202, 16, 16, 1));
+    spikes[4].push_back(Block(670, 202, 16, 16, 1));
+    spikes[4].push_back(Block(686, 202, 16, 16, 1));
+    spikes[4].push_back(Block(702, 202, 16, 16, 1));
+    spikes[4].push_back(Block(718, 202, 16, 16, 1));
+
+    spikes[4].push_back(Block(566, 62, 16, 16, 1));
+    spikes[4].push_back(Block(582, 62, 16, 16, 1));
+    spikes[4].push_back(Block(598, 62, 16, 16, 1));
+    spikes[4].push_back(Block(614, 62, 16, 16, 1));
+    spikes[4].push_back(Block(630, 62, 16, 16, 1));
+    
+    buttons[4] = Button(350, 62, 32, 8);
     buttons[4].addDoor(Block(80, 185, 59, 32, 2, 0.92, 1.0));
     
     /** NIVEL 5 **/
@@ -1515,7 +1549,7 @@ void init()
     walls[5].push_back(Block(40, 525, 820, 52));
     walls[5].push_back(Block(559, 345, 301, 180));
     walls[5].push_back(Block(559, 185, 121, 160));
-    walls[5].push_back(Block(680, 185, 100, 98));
+    walls[5].push_back(Block(680, 185, 95, 98));
     walls[5].push_back(Block(564, 0, 41, 103));
     walls[5].push_back(Block(605, 0, 255, 63));
     walls[5].push_back(Block(819, 63, 41, 283));
@@ -1524,9 +1558,43 @@ void init()
     walls[5].push_back(Block(219, 85, 41, 40));
     walls[5].push_back(Block(260, 265, 299, 98));
     walls[5].push_back(Block(299, 363, 41, 39));
-    walls[5].push_back(Block(349, 155, 121, 78));
+    walls[5].push_back(Block(349, 155, 121, 50));
     
-    /** NIVEL 6 **/
+    spikes[5].push_back(Block(40, 509, 16, 16, 3));
+    spikes[5].push_back(Block(56, 509, 16, 16, 3));
+    spikes[5].push_back(Block(72, 509, 16, 16, 3));
+    spikes[5].push_back(Block(88, 509, 16, 16, 3));
+    spikes[5].push_back(Block(104, 509, 16, 16, 3));
+   
+    spikes[5].push_back(Block(126, 362, 16, 16, 1));
+    spikes[5].push_back(Block(142, 362, 16, 16, 1));
+    spikes[5].push_back(Block(158, 362, 16, 16, 1));
+    spikes[5].push_back(Block(174, 362, 16, 16, 1));
+    
+    spikes[5].push_back(Block(205, 509, 16, 16, 3));
+    spikes[5].push_back(Block(221, 509, 16, 16, 3));
+    spikes[5].push_back(Block(237, 509, 16, 16, 3));
+    spikes[5].push_back(Block(253, 509, 16, 16, 3));
+    spikes[5].push_back(Block(269, 509, 16, 16, 3));
+    
+    spikes[5].push_back(Block(341, 362, 16, 16, 1));
+    spikes[5].push_back(Block(357, 362, 16, 16, 1));
+    
+    spikes[5].push_back(Block(362, 140, 16, 16, 3));
+    spikes[5].push_back(Block(378, 140, 16, 16, 3));
+    spikes[5].push_back(Block(394, 140, 16, 16, 3));
+    spikes[5].push_back(Block(410, 140, 16, 16, 3));
+    spikes[5].push_back(Block(426, 140, 16, 16, 3));
+    spikes[5].push_back(Block(442, 140, 16, 16, 3));
+    
+    spikes[5].push_back(Block(362, 27, 16, 16, 1));
+    spikes[5].push_back(Block(378, 27, 16, 16, 1));
+    spikes[5].push_back(Block(394, 27, 16, 16, 1));
+    spikes[5].push_back(Block(410, 27, 16, 16, 1));
+    spikes[5].push_back(Block(426, 27, 16, 16, 1));
+    spikes[5].push_back(Block(442, 27, 16, 16, 1));
+    
+    /** NIVEL 6**/
     walls[6].push_back(Block(0, 0, 40, 577));
     walls[6].push_back(Block(40, 445, 260, 132));
     walls[6].push_back(Block(40, 0, 260, 63));
@@ -1543,22 +1611,88 @@ void init()
     walls[6].push_back(Block(519, 485, 41, 40));
     walls[6].push_back(Block(639, 425, 61, 60));
     walls[6].push_back(Block(639, 265, 120, 58));
+  
+    spikes[6].push_back(Block(302, 15, 16, 16, 1));
+    spikes[6].push_back(Block(318, 15, 16, 16, 1));
+    spikes[6].push_back(Block(334, 15, 16, 16, 1));
+    spikes[6].push_back(Block(350, 15, 16, 16, 1));
+    spikes[6].push_back(Block(366, 15, 16, 16, 1));
+    spikes[6].push_back(Block(382, 15, 16, 16, 1));
+    spikes[6].push_back(Block(398, 15, 16, 16, 1));
+    spikes[6].push_back(Block(414, 15, 16, 16, 1));
+    spikes[6].push_back(Block(430, 15, 16, 16, 1));
+    spikes[6].push_back(Block(446, 15, 16, 16, 1));
+    spikes[6].push_back(Block(462, 15, 16, 16, 1));
+    spikes[6].push_back(Block(478, 15, 16, 16, 1));
+    spikes[6].push_back(Block(494, 15, 16, 16, 1));
+    spikes[6].push_back(Block(510, 15, 16, 16, 1));
+    spikes[6].push_back(Block(526, 15, 16, 16, 1));
+    spikes[6].push_back(Block(542, 15, 16, 16, 1));
+    
+    spikes[6].push_back(Block(696, 322, 16, 16, 1));
+    spikes[6].push_back(Block(712, 322, 16, 16, 1));
+    spikes[6].push_back(Block(728, 322, 16, 16, 1));
+    spikes[6].push_back(Block(744, 322, 16, 16, 1));
+
+    spikes[6].push_back(Block(305, 510, 16, 16, 3));
+    spikes[6].push_back(Block(323, 510, 16, 16, 3));
+    spikes[6].push_back(Block(339, 510, 16, 16, 3));
+    spikes[6].push_back(Block(355, 510, 16, 16, 3));
+    spikes[6].push_back(Block(371, 510, 16, 16, 3));
+    spikes[6].push_back(Block(387, 510, 16, 16, 3));
+    spikes[6].push_back(Block(403, 510, 16, 16, 3));
+    spikes[6].push_back(Block(419, 510, 16, 16, 3));
+    spikes[6].push_back(Block(435, 510, 16, 16, 3));
+    spikes[6].push_back(Block(451, 510, 16, 16, 3));
+    spikes[6].push_back(Block(467, 510, 16, 16, 3));
+    spikes[6].push_back(Block(483, 510, 16, 16, 3));
+    spikes[6].push_back(Block(499, 510, 16, 16, 3));
+    
+    spikes[6].push_back(Block(560, 510, 16, 16, 3));
+    spikes[6].push_back(Block(576, 510, 16, 16, 3));
+    spikes[6].push_back(Block(592, 510, 16, 16, 3));
+    spikes[6].push_back(Block(608, 510, 16, 16, 3));
+    spikes[6].push_back(Block(624, 510, 16, 16, 3));
+    
+    buttons[6] = Button(720, 102, 32, 8);
+    
+    buttons[6].addDoor(Block(300, 435, 340, 50, 2, 1.0, 5.31));
+    buttons[6].addDoor(Block(648, 322, 44, 103, 1, 1.0, 1.60));
     
     /** NIVEL 7 **/
-    walls[7].push_back(Block(0, 0, 92, 577));
+    walls[7].push_back(Block(0, 0, 90, 577));
     walls[7].push_back(Block(92, 485, 768, 92));
     walls[7].push_back(Block(92, 0, 160, 63));
     walls[7].push_back(Block(252, 0, 179, 16));
     walls[7].push_back(Block(431, 0, 429, 63));
     walls[7].push_back(Block(771, 63, 89, 422));
-    walls[7].push_back(Block(730, 306, 41, 179));
+    walls[7].push_back(Block(735, 306, 41, 179));
     walls[7].push_back(Block(431, 266, 181, 157));
     walls[7].push_back(Block(431, 146, 41, 120));
     walls[7].push_back(Block(551, 335, 81, 151));
     walls[7].push_back(Block(632, 335, 60, 88));
-    walls[7].push_back(Block(531, 98, 181, 97));
-    walls[7].push_back(Block(571, 195, 41, 40));
+    walls[7].push_back(Block(531, 98, 181, 70));
+    walls[7].push_back(Block(571, 168, 41, 40));
     walls[7].push_back(Block(131, 106, 121, 297));
+    
+    spikes[7].push_back(Block(96, 235, 16, 16, 1));
+    spikes[7].push_back(Block(112, 235, 16, 16, 1));
+
+    spikes[7].push_back(Block(254, 15, 16, 16, 1));
+    spikes[7].push_back(Block(270, 15, 16, 16, 1));
+    spikes[7].push_back(Block(286, 15, 16, 16, 1));
+    spikes[7].push_back(Block(302, 15, 16, 16, 1));
+    spikes[7].push_back(Block(318, 15, 16, 16, 1));
+    spikes[7].push_back(Block(334, 15, 16, 16, 1));
+    spikes[7].push_back(Block(350, 15, 16, 16, 1));
+    spikes[7].push_back(Block(366, 15, 16, 16, 1));
+    spikes[7].push_back(Block(382, 15, 16, 16, 1));
+    spikes[7].push_back(Block(398, 15, 16, 16, 1));
+    spikes[7].push_back(Block(414, 15, 16, 16, 1));
+
+    buttons[7] = Button(477, 422, 32, 8);
+    
+    buttons[7].addDoor(Block(92, 194, 40, 41, 2, 1.0, 0.625));
     
     /** NIVEL 8 **/
     walls[8].push_back(Block(0, 0, 69, 577));
@@ -1567,17 +1701,37 @@ void init()
     walls[8].push_back(Block(788, 0, 72, 577));
     walls[8].push_back(Block(69, 106, 100, 77));
     walls[8].push_back(Block(128, 183, 41, 60));
-    walls[8].push_back(Block(169, 146, 180, 57));
+    walls[8].push_back(Block(169, 146, 180, 53));
     walls[8].push_back(Block(308, 106, 41, 40));
     walls[8].push_back(Block(428, 395, 41, 151));
     walls[8].push_back(Block(348, 395, 80, 88));
-    walls[8].push_back(Block(348, 246, 41, 149));
-    walls[8].push_back(Block(268, 246, 281, 57));
-    walls[8].push_back(Block(388, 106, 41, 140));
+    walls[8].push_back(Block(348, 249, 41, 149));
+    walls[8].push_back(Block(268, 249, 281, 57));
+    walls[8].push_back(Block(390, 106, 37, 145));
     walls[8].push_back(Block(175, 366, 121, 97));
     walls[8].push_back(Block(521, 366, 121, 97));
     walls[8].push_back(Block(648, 106, 140, 117));
     walls[8].push_back(Block(468, 106, 180, 77));
+
+    spikes[8].push_back(Block(69, 530, 16, 16, 3));
+    spikes[8].push_back(Block(85, 530, 16, 16, 3));
+    spikes[8].push_back(Block(101, 530, 16, 16, 3));
+    spikes[8].push_back(Block(117, 530, 16, 16, 3));
+    spikes[8].push_back(Block(133, 530, 16, 16, 3));
+
+    spikes[8].push_back(Block(774, 530, 16, 16, 3));
+    spikes[8].push_back(Block(758, 530, 16, 16, 3));
+    spikes[8].push_back(Block(742, 530, 16, 16, 3));
+    spikes[8].push_back(Block(726, 530, 16, 16, 3));
+    spikes[8].push_back(Block(710, 530, 16, 16, 3));
+
+    spikes[8].push_back(Block(550, 91, 16, 16, 3));
+    spikes[8].push_back(Block(566, 91, 16, 16, 3));
+    spikes[8].push_back(Block(582, 91, 16, 16, 3));
+    spikes[8].push_back(Block(598, 91, 16, 16, 3));
+    spikes[8].push_back(Block(614, 91, 16, 16, 3));
+    spikes[8].push_back(Block(630, 91, 16, 16, 3));
+    spikes[8].push_back(Block(646, 91, 16, 16, 3));
     
     /** NIVEL 9 **/
     walls[9].push_back(Block(0, 0, 80, 577));
@@ -1587,43 +1741,105 @@ void init()
     walls[9].push_back(Block(79, 189, 261, 137));
     walls[9].push_back(Block(519, 189, 260, 137));
     walls[9].push_back(Block(250, 435, 361, 57));
-    walls[9].push_back(Block(330, 375, 201, 60));
+    walls[9].push_back(Block(330, 377, 201, 60));
+    
+    spikes[9].push_back(Block(80, 173, 16, 16, 3));
+    spikes[9].push_back(Block(96, 173, 16, 16, 3));
+    spikes[9].push_back(Block(112, 173, 16, 16, 3));
+    spikes[9].push_back(Block(128, 173, 16, 16, 3));
+    spikes[9].push_back(Block(144, 173, 16, 16, 3));
+    spikes[9].push_back(Block(160, 173, 16, 16, 3));
+    spikes[9].push_back(Block(176, 173, 16, 16, 3));
+    spikes[9].push_back(Block(192, 173, 16, 16, 3));
+    spikes[9].push_back(Block(208, 173, 16, 16, 3));
+    spikes[9].push_back(Block(224, 173, 16, 16, 3));
+    spikes[9].push_back(Block(240, 173, 16, 16, 3));
+    spikes[9].push_back(Block(256, 173, 16, 16, 3));
+    spikes[9].push_back(Block(272, 173, 16, 16, 3));
+    spikes[9].push_back(Block(288, 173, 16, 16, 3));
+    spikes[9].push_back(Block(304, 173, 16, 16, 3));
+   
+    spikes[9].push_back(Block(764, 173, 16, 16, 3));
+    spikes[9].push_back(Block(748, 173, 16, 16, 3));
+    spikes[9].push_back(Block(732, 173, 16, 16, 3));
+    spikes[9].push_back(Block(716, 173, 16, 16, 3));
+    spikes[9].push_back(Block(700, 173, 16, 16, 3));
+    spikes[9].push_back(Block(684, 173, 16, 16, 3));
+    spikes[9].push_back(Block(668, 173, 16, 16, 3));
+    spikes[9].push_back(Block(652, 173, 16, 16, 3));
+    spikes[9].push_back(Block(636, 173, 16, 16, 3));
+    spikes[9].push_back(Block(620, 173, 16, 16, 3));
+    spikes[9].push_back(Block(604, 173, 16, 16, 3));
+    spikes[9].push_back(Block(588, 173, 16, 16, 3));
+    spikes[9].push_back(Block(572, 173, 16, 16, 3));
+    spikes[9].push_back(Block(556, 173, 16, 16, 3));
+    spikes[9].push_back(Block(540, 173, 16, 16, 3));
+
+    spikes[9].push_back(Block(340, 240, 16, 16, 2));
+    spikes[9].push_back(Block(340, 256, 16, 16, 2));
+    spikes[9].push_back(Block(340, 272, 16, 16, 2));
+
+    spikes[9].push_back(Block(504, 240, 16, 16, 4));
+    spikes[9].push_back(Block(504, 256, 16, 16, 4));
+    spikes[9].push_back(Block(504, 272, 16, 16, 4));
+    
+    spikes[9].push_back(Block(342, 65, 16, 16, 1));
+    spikes[9].push_back(Block(358, 65, 16, 16, 1));
+    spikes[9].push_back(Block(374, 65, 16, 16, 1));
+    spikes[9].push_back(Block(390, 65, 16, 16, 1));
+    spikes[9].push_back(Block(406, 65, 16, 16, 1));
+    spikes[9].push_back(Block(422, 65, 16, 16, 1));
+    spikes[9].push_back(Block(438, 65, 16, 16, 1));
+    spikes[9].push_back(Block(454, 65, 16, 16, 1));
+    spikes[9].push_back(Block(470, 65, 16, 16, 1));
+    spikes[9].push_back(Block(486, 65, 16, 16, 1));
+    spikes[9].push_back(Block(502, 65, 16, 16, 1));
+
+    spikes[9].push_back(Block(80, 65, 16, 16, 1));
+    spikes[9].push_back(Block(96, 65, 16, 16, 1));
+
+    spikes[9].push_back(Block(764, 65, 16, 16, 1));
+    spikes[9].push_back(Block(748, 65, 16, 16, 1));
+
+    buttons[9] = Button(580, 65, 32, 8);
+    
+    buttons[9].addDoor(Block(340, 197, 180, 43, 2, 1.0, 2.81));
     
     /** BASES NIVEL 1 **/
-    goals[1][0] = Block(393, 341, 29, 40); // NIÑO
-    goals[1][1] = Block(393, 213, 29, 40); // NIÑA
+    goals[1][0] = Block(390, 341, 35, 4); // NIÑO
+    goals[1][1] = Block(390, 249, 35, 4); // NIÑA
     
     /** BASES NIVEL 2 **/
-    goals[2][0] = Block(415, 323, 32, 43); // NIÑO
-    goals[2][1] = Block(415, 182, 32, 43); // NIÑA
+    goals[2][0] = Block(412, 323, 38, 4); // NIÑO
+    goals[2][1] = Block(412, 221, 38, 4); // NIÑA
 
     /** BASES NIVEL 3 **/
-    goals[3][0] = Block(50, 430, 29, 39); // NIÑO
-    goals[3][1] = Block(50, 301, 29, 39); // NIÑA
+    goals[3][0] = Block(47, 430, 35, 4); // NIÑO
+    goals[3][1] = Block(47, 336, 35, 4); // NIÑA
     
     /** BASES NIVEL 4 **/
-    goals[4][0] = Block(225, 363, 31, 42); // NIÑA
-    goals[4][1] = Block(225, 224, 31, 41); // NIÑO
+    goals[4][0] = Block(222, 363, 37, 3); // NIÑA
+    goals[4][1] = Block(222, 262, 37, 3); // NIÑO
     
     /** BASES NIVEL 5 **/
-    goals[5][0] = Block(697, 283, 32, 42); // NIÑA
-    goals[5][1] = Block(697, 142, 32, 43); // NIÑO
+    goals[5][0] = Block(694, 283, 38, 4); // NIÑA
+    goals[5][1] = Block(694, 181, 38, 4); // NIÑO
     
     /** BASES NIVEL 6 **/
-    goals[6][0] = Block(135, 363, 30, 40); // NIÑA
-    goals[6][1] = Block(135, 225, 30, 40); // NIÑO
+    goals[6][0] = Block(132, 363, 36, 4); // NIÑA
+    goals[6][1] = Block(132, 262, 36, 4); // NIÑO
     
     /** BASES NIVEL 7 **/
-    goals[7][0] = Block(648, 423, 29, 40); // NIÑA
-    goals[7][1] = Block(648, 295, 29, 40); // NIÑO
+    goals[7][0] = Block(645, 423, 35, 4); // NIÑA
+    goals[7][1] = Block(645, 332, 35, 4); // NIÑO
     
     /** BASES NIVEL 8 **/
-    goals[8][0] = Block(393, 483, 29, 40); // NIÑO
-    goals[8][1] = Block(393, 355, 29, 40); // NIÑA
+    goals[8][0] = Block(390, 483, 35, 4); // NIÑO
+    goals[8][1] = Block(390, 392, 35, 4); // NIÑA
     
     /** BASES NIVEL 9 **/
-    goals[9][0] = Block(301, 492, 29, 40); // NIÑO
-    goals[9][1] = Block(531, 492, 29, 40); // NIÑA
+    goals[9][0] = Block(301, 492, 28, 5); // NIÑO
+    goals[9][1] = Block(531, 492, 28, 5); // NIÑA
     
     
     /*
