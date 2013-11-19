@@ -7,11 +7,11 @@
 //
 
 /*
- * TODO:    - CHECA QUE LOS PERSONAJES PASEN POR TODOS LOS SITIOS
- *          - QUE SE PUEDAN PASAR LOS NIVELES
- *          - AGREGAR LAS CUERDAS FALTANTES
+ * TODO:    -
+ *          -
  *          - AGREGAR SONIDO
  *          - AGREGAR ILUMINACION
+ *          -
  */
 
 #ifdef __APPLE__
@@ -42,7 +42,7 @@
  * 9 - Level 9
  * 10 - Level 10
  */
-const int LISTS_COUNT = 12;
+const int LISTS_COUNT = 20;
 std::list<Block> walls[LISTS_COUNT];
 unsigned long walls_list_size[LISTS_COUNT];
 
@@ -84,6 +84,14 @@ const float character_init_pos[LISTS_COUNT][8] =
     , {146, 66, 673, 66, 0, 0, 1, 0}
     , {1000, 1000, 1000, 1000, 1, 0, 0, 1}
     , {1000, 1000, 1000, 1000, 1, 0, 0, 1}
+    , {1000, 1000, 1000, 1000, 1, 0, 0, 1}
+    , {1000, 1000, 1000, 1000, 1, 0, 0, 1}
+    , {1000, 1000, 1000, 1000, 1, 0, 0, 1}
+    , {1000, 1000, 1000, 1000, 1, 0, 0, 1}
+    , {1000, 1000, 1000, 1000, 1, 0, 0, 1}
+    , {1000, 1000, 1000, 1000, 1, 0, 0, 1}
+    , {1000, 1000, 1000, 1000, 1, 0, 0, 1}
+    , {1000, 1000, 1000, 1000, 1, 0, 0, 1}
 };
 
 /**
@@ -100,7 +108,7 @@ const float character_init_pos[LISTS_COUNT][8] =
  * 10 - Congratulations
  * 11 - Instructions
  */
-static GLuint texturesBack[12];
+static GLuint texturesBack[13];
 
 /**
  * 0 - Boy_Down_Right
@@ -112,7 +120,7 @@ static GLuint texturesBack[12];
  * 6 - Girl_Up_Right
  * 7 - Girl_Up_Left
  */
-static GLuint textures[6];
+static GLuint textures[7];
 
 int current_level = 0;
 
@@ -123,13 +131,15 @@ GLint         window_width = 860
             , boy_movement = 0
             , girl_movement = 0;
 
-GLfloat       vertical_movement_speed = 1.0
-            , horizontal_movement_speed = 2.0;
+GLfloat       vertical_movement_speed = 2.0
+            , horizontal_movement_speed = 2.0
+            , angulo_estrella = 0.0;
 
 GLboolean   //  vertical_movement_lock = false
             //, horizontal_movement_lock = false
               boy_move_down = (character_init_pos[current_level][5] == 0 ? true : false) //true
-            , girl_move_down = (character_init_pos[current_level][7] == 0 ? true : false);
+            , girl_move_down = (character_init_pos[current_level][7] == 0 ? true : false)
+            , rota_estrella = false;
 //            , boy_vertical_move = false
 //            , girl_vertical_move = false;
 
@@ -154,6 +164,8 @@ void keyboard(unsigned char, int, int);
 void display();
 void addMenu();
 void init();
+void drawBanner(int);
+void changeLevel(int);
 
 /*
  ********** FUNCION *********
@@ -1054,6 +1066,19 @@ void keyboard(unsigned char key, int x, int y)
                 break;
         }
     }
+    
+    if (12 <= current_level)
+    {
+        switch (key) {
+            case ' ':
+                if (12 <= current_level)
+                {
+                    changeLevel(current_level - 11);
+                    rota_estrella = false;
+                }
+                break;
+        }
+    }
 }
 
 void specKey(int key, int x, int y)
@@ -1244,6 +1269,7 @@ void resetLevel()
     boy.setY(character_init_pos[current_level][1]);
     girl.setX(character_init_pos[current_level][2]);
     girl.setY(character_init_pos[current_level][3]);
+    
     glutPostRedisplay();
 }
 
@@ -1257,7 +1283,9 @@ void myMouseButton(int button, int state, int mouseX, int mouseY)
             GLint y = window_height - mouseY; //el alto se puede modificar con la ventana
             if (x >= 366 && x <= 494 && y >= 249 && y <= 304) // iniciar
             {
-                nextLevel();
+                //nextLevel();
+                changeLevel(current_level + 12);
+                rota_estrella = true;
             }
             else if (x >= 314 && x <= 547 && y >= 177 && y <= 232) // instrucciones
             {
@@ -1269,13 +1297,25 @@ void myMouseButton(int button, int state, int mouseX, int mouseY)
             }
         }
     }
+    if (10 == current_level)
+    {
+        if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+        {
+            GLint x = mouseX;
+            GLint y = window_height - mouseY; //el alto se puede modificar con la ventana
+            if (x >= 341 && x <= 518 && y >= 36 && y <= 95) // fin
+            {
+                nextLevel();
+            }
+        }
+    }
     if (11 == current_level)
     {
         if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
         {
             GLint x = mouseX;
             GLint y = window_height - mouseY; //el alto se puede modificar con la ventana
-            if (x >= 366 && x <= 494 && y >= 38 && y <= 93) // iniciar
+            if (x >= 366 && x <= 494 && y >= 38 && y <= 93) // regresar
             {
                 changeLevel(0);
             }
@@ -1636,6 +1676,47 @@ void drawBackground()
     glDisable(GL_TEXTURE_2D);
 }
 
+void drawBanner()
+{
+    float     width = 200.0
+            , height = 200.0
+            , x = 200.0
+            , y = 100.0;
+    
+    glEnable(GL_TEXTURE_2D);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glColor3f(1.0, 1.0, 1.0);
+    glTranslatef(x+width/2, y+height/2, 0); // move back to focus of gluLookAt
+    glRotatef(angulo_estrella, 0, 0, 1);
+    glTranslatef(-x-(width/2), -y-(height/2), 0); //move object to center
+    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex2f(x, y);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex2f(x+width, y);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex2f(x+width, y+height);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex2f(x, y+height);
+    glEnd();
+    glPopMatrix();
+    
+    angulo_estrella++;
+    
+    glutPostRedisplay();
+    
+    
+
+//    glTranslatef(100, 100, 0);
+    
+    
+    
+    
+    
+}
+
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -1644,13 +1725,18 @@ void display()
     
     drawCharacters();
     
-    drawWalls(walls[current_level]);
+    //drawWalls(walls[current_level]);
     
     drawSpikes(spikes[current_level]);
     
     drawButtonDoors(buttons[current_level]);
     
     drawRopes(ropes[current_level]);
+    
+    if (rota_estrella)
+    {
+        drawBanner();
+    }
     
     //drawGoals();
     
@@ -1702,6 +1788,31 @@ void movement(int v)
             if (collisionRopes(boy, ropes[current_level]))
             {
                 boy_move_down = !boy_move_down;
+                
+                if (boy_movement == 5)
+                {
+                    boy_movement = 1;
+                }
+                else if (boy_movement == 1)
+                {
+                    boy_movement = 5;
+                }
+                else if (boy_movement == 4)
+                {
+                    boy_movement = 2;
+                }
+                else if (boy_movement == 6)
+                {
+                    boy_movement = 8; //CCC
+                }
+                else if (boy_movement == 8)
+                {
+                    boy_movement = 6;
+                }
+                else if (boy_movement == 2)
+                {
+                    boy_movement = 4;
+                }
             }
         }
         else //si colisiona
@@ -1748,6 +1859,31 @@ void movement(int v)
             if (collisionRopes(boy, ropes[current_level]))
             {
                 boy_move_down = !boy_move_down;
+                
+                if (boy_movement == 5)
+                {
+                    boy_movement = 1;
+                }
+                else if (boy_movement == 1)
+                {
+                    boy_movement = 5;
+                }
+                else if (boy_movement == 4)
+                {
+                    boy_movement = 2;
+                }
+                else if (boy_movement == 6)
+                {
+                    boy_movement = 8; //CCC
+                }
+                else if (boy_movement == 8)
+                {
+                    boy_movement = 6;
+                }
+                else if (boy_movement == 2)
+                {
+                    boy_movement = 4;
+                }
             }
         }
         else //si colisiona
@@ -1805,6 +1941,31 @@ void movement(int v)
             if (collisionRopes(boy, ropes[current_level]))
             {
                 boy_move_down = !boy_move_down;
+                
+                if (boy_movement == 5)
+                {
+                    boy_movement = 1;
+                }
+                else if (boy_movement == 1)
+                {
+                    boy_movement = 5;
+                }
+                else if (boy_movement == 4)
+                {
+                    boy_movement = 2;
+                }
+                else if (boy_movement == 6)
+                {
+                    boy_movement = 8; //CCC
+                }
+                else if (boy_movement == 8)
+                {
+                    boy_movement = 6;
+                }
+                else if (boy_movement == 2)
+                {
+                    boy_movement = 4;
+                }
             }
         }
         else //si colisiona
@@ -1844,6 +2005,31 @@ void movement(int v)
             if (collisionRopes(boy, ropes[current_level]))
             {
                 boy_move_down = !boy_move_down;
+                
+                if (boy_movement == 5)
+                {
+                    boy_movement = 1;
+                }
+                else if (boy_movement == 1)
+                {
+                    boy_movement = 5;
+                }
+                else if (boy_movement == 4)
+                {
+                    boy_movement = 2;
+                }
+                else if (boy_movement == 6)
+                {
+                    boy_movement = 8; //CCC
+                }
+                else if (boy_movement == 8)
+                {
+                    boy_movement = 6;
+                }
+                else if (boy_movement == 2)
+                {
+                    boy_movement = 4;
+                }
             }
         }
         else //si colisiona
@@ -1890,6 +2076,31 @@ void movement(int v)
             if (collisionRopes(boy, ropes[current_level]))
             {
                 boy_move_down = !boy_move_down;
+                
+                if (boy_movement == 5)
+                {
+                    boy_movement = 1;
+                }
+                else if (boy_movement == 1)
+                {
+                    boy_movement = 5;
+                }
+                else if (boy_movement == 4)
+                {
+                    boy_movement = 2;
+                }
+                else if (boy_movement == 6)
+                {
+                    boy_movement = 8; //CCC
+                }
+                else if (boy_movement == 8)
+                {
+                    boy_movement = 6;
+                }
+                else if (boy_movement == 2)
+                {
+                    boy_movement = 4;
+                }
             }
         }
         else //si colisiona
@@ -1947,6 +2158,31 @@ void movement(int v)
             if (collisionRopes(boy, ropes[current_level]))
             {
                 boy_move_down = !boy_move_down;
+                
+                if (boy_movement == 5)
+                {
+                    boy_movement = 1;
+                }
+                else if (boy_movement == 1)
+                {
+                    boy_movement = 5;
+                }
+                else if (boy_movement == 4)
+                {
+                    boy_movement = 2;
+                }
+                else if (boy_movement == 6)
+                {
+                    boy_movement = 8; //CCC
+                }
+                else if (boy_movement == 8)
+                {
+                    boy_movement = 6;
+                }
+                else if (boy_movement == 2)
+                {
+                    boy_movement = 4;
+                }
             }
         }
         else //si colisiona
@@ -1993,6 +2229,31 @@ void movement(int v)
             if (collisionRopes(girl, ropes[current_level]))
             {
                 girl_move_down = !girl_move_down;
+                
+                if (girl_movement == 5)
+                {
+                    girl_movement = 1;
+                }
+                else if (girl_movement == 1)
+                {
+                    girl_movement = 5;
+                }
+                else if (girl_movement == 4)
+                {
+                    girl_movement = 2;
+                }
+                else if (girl_movement == 6)
+                {
+                    girl_movement = 8; //CCC
+                }
+                else if (girl_movement == 8)
+                {
+                    girl_movement = 6;
+                }
+                else if (girl_movement == 2)
+                {
+                    girl_movement = 4;
+                }
             }
         }
         else //si colisiona
@@ -2039,6 +2300,31 @@ void movement(int v)
             if (collisionRopes(girl, ropes[current_level]))
             {
                 girl_move_down = !girl_move_down;
+                
+                if (girl_movement == 5)
+                {
+                    girl_movement = 1;
+                }
+                else if (girl_movement == 1)
+                {
+                    girl_movement = 5;
+                }
+                else if (girl_movement == 4)
+                {
+                    girl_movement = 2;
+                }
+                else if (girl_movement == 6)
+                {
+                    girl_movement = 8; //CCC
+                }
+                else if (girl_movement == 8)
+                {
+                    girl_movement = 6;
+                }
+                else if (girl_movement == 2)
+                {
+                    girl_movement = 4;
+                }
             }
         }
         else //si colisiona
@@ -2096,6 +2382,31 @@ void movement(int v)
             if (collisionRopes(girl, ropes[current_level]))
             {
                 girl_move_down = !girl_move_down;
+                
+                if (girl_movement == 5)
+                {
+                    girl_movement = 1;
+                }
+                else if (girl_movement == 1)
+                {
+                    girl_movement = 5;
+                }
+                else if (girl_movement == 4)
+                {
+                    girl_movement = 2;
+                }
+                else if (girl_movement == 6)
+                {
+                    girl_movement = 8; //CCC
+                }
+                else if (girl_movement == 8)
+                {
+                    girl_movement = 6;
+                }
+                else if (girl_movement == 2)
+                {
+                    girl_movement = 4;
+                }
             }
         }
         else //si colisiona
@@ -2135,6 +2446,31 @@ void movement(int v)
             if (collisionRopes(girl, ropes[current_level]))
             {
                 girl_move_down = !girl_move_down;
+                
+                if (girl_movement == 5)
+                {
+                    girl_movement = 1;
+                }
+                else if (girl_movement == 1)
+                {
+                    girl_movement = 5;
+                }
+                else if (girl_movement == 4)
+                {
+                    girl_movement = 2;
+                }
+                else if (girl_movement == 6)
+                {
+                    girl_movement = 8; //CCC
+                }
+                else if (girl_movement == 8)
+                {
+                    girl_movement = 6;
+                }
+                else if (girl_movement == 2)
+                {
+                    girl_movement = 4;
+                }
             }
         }
         else //si colisiona
@@ -2181,6 +2517,31 @@ void movement(int v)
             if (collisionRopes(girl, ropes[current_level]))
             {
                 girl_move_down = !girl_move_down;
+                
+                if (girl_movement == 5)
+                {
+                    girl_movement = 1;
+                }
+                else if (girl_movement == 1)
+                {
+                    girl_movement = 5;
+                }
+                else if (girl_movement == 4)
+                {
+                    girl_movement = 2;
+                }
+                else if (girl_movement == 6)
+                {
+                    girl_movement = 8; //CCC
+                }
+                else if (girl_movement == 8)
+                {
+                    girl_movement = 6;
+                }
+                else if (girl_movement == 2)
+                {
+                    girl_movement = 4;
+                }
             }
         }
         else //si colisiona
@@ -2238,6 +2599,31 @@ void movement(int v)
             if (collisionRopes(girl, ropes[current_level]))
             {
                 girl_move_down = !girl_move_down;
+                
+                if (girl_movement == 5)
+                {
+                    girl_movement = 1;
+                }
+                else if (girl_movement == 1)
+                {
+                    girl_movement = 5;
+                }
+                else if (girl_movement == 4)
+                {
+                    girl_movement = 2;
+                }
+                else if (girl_movement == 6)
+                {
+                    girl_movement = 8; //CCC
+                }
+                else if (girl_movement == 8)
+                {
+                    girl_movement = 6;
+                }
+                else if (girl_movement == 2)
+                {
+                    girl_movement = 4;
+                }
             }
         }
         else //si colisiona
@@ -2282,7 +2668,7 @@ void initRendering()
     glEnable(GL_TEXTURE_2D);
     
     /** FONDOS **/
-    glGenTextures(12, texturesBack); //Make room for our texture
+    glGenTextures(13, texturesBack); //Make room for our texture
     
     image = loadBMP("images/background/inicio.bmp");
     loadTexture(image, texturesBack, 0);
@@ -2308,9 +2694,11 @@ void initRendering()
     loadTexture(image, texturesBack, 10);
     image = loadBMP("images/background/instrucciones.bmp");
     loadTexture(image, texturesBack, 11);
+    image = loadBMP("images/background/instrucciones.bmp");
+    loadTexture(image, texturesBack, 12);
     
     /** OTRAS TEXTURAS **/
-    glGenTextures(6, textures); //Make room for our texture
+    glGenTextures(7, textures); //Make room for our texture
     image = loadBMP("images/character/boy.bmp");
     loadTexture(image, textures, 0);
     image = loadBMP("images/character/girl.bmp");
@@ -2323,6 +2711,8 @@ void initRendering()
     loadTexture(image, textures, 4);
     image = loadBMP("images/other/rope.bmp");
     loadTexture(image, textures, 5);
+    //image = loadBMP("images/other/star.bmp");
+    //loadTexture(image, textures, 6);
     
     delete image;
 }
@@ -2424,11 +2814,11 @@ void init()
     spikes[4].push_back(Block(702, 202, 16, 16, 1));
     spikes[4].push_back(Block(718, 202, 16, 16, 1));
 
-    spikes[4].push_back(Block(566, 62, 16, 16, 1));
+    /*spikes[4].push_back(Block(566, 62, 16, 16, 1));
     spikes[4].push_back(Block(582, 62, 16, 16, 1));
     spikes[4].push_back(Block(598, 62, 16, 16, 1));
     spikes[4].push_back(Block(614, 62, 16, 16, 1));
-    spikes[4].push_back(Block(630, 62, 16, 16, 1));
+    spikes[4].push_back(Block(630, 62, 16, 16, 1));*/
     
     buttons[4] = Button(350, 62, 32, 8);
     buttons[4].addDoor(Block(80, 185, 59, 32, 2, 0.92, 1.0));
@@ -2519,7 +2909,7 @@ void init()
     spikes[6].push_back(Block(526, 15, 16, 16, 1));
     spikes[6].push_back(Block(542, 15, 16, 16, 1));
     
-    spikes[6].push_back(Block(696, 322, 16, 16, 1));
+    //spikes[6].push_back(Block(696, 322, 16, 16, 1));
     spikes[6].push_back(Block(712, 322, 16, 16, 1));
     spikes[6].push_back(Block(728, 322, 16, 16, 1));
     spikes[6].push_back(Block(744, 322, 16, 16, 1));
@@ -2561,9 +2951,9 @@ void init()
     walls[7].push_back(Block(431, 146, 41, 120));
     walls[7].push_back(Block(551, 335, 81, 151));
     walls[7].push_back(Block(632, 335, 60, 88));
-    walls[7].push_back(Block(531, 98, 181, 70));
+    walls[7].push_back(Block(531, 115, 181, 63));
     walls[7].push_back(Block(571, 168, 41, 40));
-    walls[7].push_back(Block(131, 106, 121, 297));
+    walls[7].push_back(Block(131, 116, 121, 287));
     
     spikes[7].push_back(Block(96, 235, 16, 16, 1, true));
     spikes[7].push_back(Block(112, 235, 16, 16, 1, true));
@@ -2596,8 +2986,8 @@ void init()
     walls[8].push_back(Block(308, 106, 41, 40));
     walls[8].push_back(Block(428, 395, 41, 151));
     walls[8].push_back(Block(348, 395, 80, 88));
-    walls[8].push_back(Block(348, 249, 41, 149));
-    walls[8].push_back(Block(268, 249, 281, 57));
+    walls[8].push_back(Block(348, 259, 41, 139));
+    walls[8].push_back(Block(268, 250, 281, 56)); //BBB
     walls[8].push_back(Block(390, 106, 37, 145));
     walls[8].push_back(Block(175, 366, 121, 97));
     walls[8].push_back(Block(521, 366, 121, 97));
@@ -2608,7 +2998,7 @@ void init()
     spikes[8].push_back(Block(85, 530, 16, 16, 3));
     spikes[8].push_back(Block(101, 530, 16, 16, 3));
     spikes[8].push_back(Block(117, 530, 16, 16, 3));
-    spikes[8].push_back(Block(133, 530, 16, 16, 3));
+    //spikes[8].push_back(Block(133, 530, 16, 16, 3));
 
     spikes[8].push_back(Block(774, 530, 16, 16, 3));
     spikes[8].push_back(Block(758, 530, 16, 16, 3));
@@ -2623,6 +3013,9 @@ void init()
     spikes[8].push_back(Block(614, 91, 16, 16, 3));
     spikes[8].push_back(Block(630, 91, 16, 16, 3));
     spikes[8].push_back(Block(646, 91, 16, 16, 3));
+    
+    ropes[8].push_back(Block(170, 120, 138, 16, 1, 8.625, 1.0));
+    ropes[8].push_back(Block(70, 200, 59, 16, 1, 3.6875, 1.0));
     
     /** NIVEL 9 **/
     walls[9].push_back(Block(0, 0, 80, 577));
@@ -2674,7 +3067,7 @@ void init()
     spikes[9].push_back(Block(504, 256, 16, 16, 4));
     spikes[9].push_back(Block(504, 272, 16, 16, 4));
     
-    spikes[9].push_back(Block(342, 65, 16, 16, 1));
+    //spikes[9].push_back(Block(342, 65, 16, 16, 1));
     spikes[9].push_back(Block(358, 65, 16, 16, 1));
     spikes[9].push_back(Block(374, 65, 16, 16, 1));
     spikes[9].push_back(Block(390, 65, 16, 16, 1));
@@ -2684,7 +3077,7 @@ void init()
     spikes[9].push_back(Block(454, 65, 16, 16, 1));
     spikes[9].push_back(Block(470, 65, 16, 16, 1));
     spikes[9].push_back(Block(486, 65, 16, 16, 1));
-    spikes[9].push_back(Block(502, 65, 16, 16, 1));
+    //spikes[9].push_back(Block(502, 65, 16, 16, 1));
 
     spikes[9].push_back(Block(80, 65, 16, 16, 1));
     spikes[9].push_back(Block(96, 65, 16, 16, 1));
@@ -2709,20 +3102,20 @@ void init()
     goals[3][1] = Block(47, 336, 35, 4); // NIÑA
     
     /** BASES NIVEL 4 **/
-    goals[4][0] = Block(222, 363, 37, 3); // NIÑA
-    goals[4][1] = Block(222, 262, 37, 3); // NIÑO
+    goals[4][1] = Block(222, 363, 37, 3); // NIÑA
+    goals[4][0] = Block(222, 262, 37, 3); // NIÑO
     
     /** BASES NIVEL 5 **/
     goals[5][0] = Block(694, 283, 38, 4); // NIÑA
     goals[5][1] = Block(694, 181, 38, 4); // NIÑO
     
     /** BASES NIVEL 6 **/
-    goals[6][0] = Block(132, 363, 36, 4); // NIÑA
-    goals[6][1] = Block(132, 262, 36, 4); // NIÑO
+    goals[6][0] = Block(132, 262, 36, 4); // NIÑA
+    goals[6][1] = Block(132, 363, 36, 4); // NIÑO
     
     /** BASES NIVEL 7 **/
-    goals[7][0] = Block(645, 423, 35, 4); // NIÑA
-    goals[7][1] = Block(645, 332, 35, 4); // NIÑO
+    goals[7][1] = Block(645, 423, 35, 4); // NIÑA
+    goals[7][0] = Block(645, 332, 35, 4); // NIÑO
     
     /** BASES NIVEL 8 **/
     goals[8][0] = Block(390, 483, 35, 4); // NIÑO
