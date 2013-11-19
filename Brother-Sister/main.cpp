@@ -133,13 +133,15 @@ GLint         window_width = 860
 
 GLfloat       vertical_movement_speed = 2.0
             , horizontal_movement_speed = 2.0
-            , angulo_estrella = 0.0;
+            , angulo_estrella = 0.0
+            , tamano_estrella = 0.0;
 
 GLboolean   //  vertical_movement_lock = false
             //, horizontal_movement_lock = false
               boy_move_down = (character_init_pos[current_level][5] == 0 ? true : false) //true
             , girl_move_down = (character_init_pos[current_level][7] == 0 ? true : false)
-            , rota_estrella = false;
+            , rota_estrella = false
+            , hola = true;
 //            , boy_vertical_move = false
 //            , girl_vertical_move = false;
 
@@ -1680,17 +1682,20 @@ void drawBanner()
 {
     float     width = 200.0
             , height = 200.0
-            , x = 200.0
-            , y = 100.0;
+            , x = 330.0
+            , y = 300.0;
     
     glEnable(GL_TEXTURE_2D);
     glMatrixMode(GL_MODELVIEW);
+
     glPushMatrix();
     glColor3f(1.0, 1.0, 1.0);
     glTranslatef(x+width/2, y+height/2, 0); // move back to focus of gluLookAt
     glRotatef(angulo_estrella, 0, 0, 1);
+    glScalef(tamano_estrella/15, tamano_estrella/15, 1);
     glTranslatef(-x-(width/2), -y-(height/2), 0); //move object to center
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
+    glBindTexture(GL_TEXTURE_2D, textures[6]);
+    
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 0.0f);
     glVertex2f(x, y);
@@ -1705,15 +1710,17 @@ void drawBanner()
     
     angulo_estrella++;
     
+    if (tamano_estrella>=15) {
+        hola = false;
+    }if(hola == false){
+        tamano_estrella= tamano_estrella-.2;
+    }if (tamano_estrella<5){
+        hola=true;
+    }if(hola == true){
+        tamano_estrella= tamano_estrella+.2;
+    }
+    
     glutPostRedisplay();
-    
-    
-
-//    glTranslatef(100, 100, 0);
-    
-    
-    
-    
     
 }
 
@@ -2694,7 +2701,7 @@ void initRendering()
     loadTexture(image, texturesBack, 10);
     image = loadBMP("images/background/instrucciones.bmp");
     loadTexture(image, texturesBack, 11);
-    image = loadBMP("images/background/instrucciones.bmp");
+    image = loadBMP("images/background/pasaNivel.bmp");
     loadTexture(image, texturesBack, 12);
     
     /** OTRAS TEXTURAS **/
@@ -2711,8 +2718,8 @@ void initRendering()
     loadTexture(image, textures, 4);
     image = loadBMP("images/other/rope.bmp");
     loadTexture(image, textures, 5);
-    //image = loadBMP("images/other/star.bmp");
-    //loadTexture(image, textures, 6);
+    image = loadBMP("images/other/star.bmp");
+    loadTexture(image, textures, 6);
     
     delete image;
 }
@@ -2982,17 +2989,17 @@ void init()
     walls[8].push_back(Block(788, 0, 72, 577));
     walls[8].push_back(Block(69, 106, 100, 77));
     walls[8].push_back(Block(128, 183, 41, 60));
-    walls[8].push_back(Block(169, 146, 180, 53));
-    walls[8].push_back(Block(308, 106, 41, 40));
+    walls[8].push_back(Block(169, 146, 170, 53));//
+    walls[8].push_back(Block(308, 106, 30, 40));//
     walls[8].push_back(Block(428, 395, 41, 151));
     walls[8].push_back(Block(348, 395, 80, 88));
     walls[8].push_back(Block(348, 259, 41, 139));
-    walls[8].push_back(Block(268, 250, 281, 56)); //BBB
+    walls[8].push_back(Block(268, 250, 281, 56));
     walls[8].push_back(Block(390, 106, 37, 145));
     walls[8].push_back(Block(175, 366, 121, 97));
     walls[8].push_back(Block(521, 366, 121, 97));
     walls[8].push_back(Block(648, 106, 140, 117));
-    walls[8].push_back(Block(468, 106, 180, 77));
+    walls[8].push_back(Block(478, 106, 180, 77));//
 
     spikes[8].push_back(Block(69, 530, 16, 16, 3));
     spikes[8].push_back(Block(85, 530, 16, 16, 3));
