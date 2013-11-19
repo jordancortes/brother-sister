@@ -8,6 +8,18 @@
 
 #include "Block.h"
 
+/*
+ float x, y, height, width;
+ int side;
+ float repeat_x, repeat_y;
+ bool hide; //should hide when a door is hide (spikes)
+ 
+ Block(float, float, float, float);
+ Block(float, float, float, float, int);
+ Block(float, float, float, float, int, bool);
+ Block(float, float, float, float, int, float, float);
+ */
+
 Block::Block()
 {
     x = 0;
@@ -15,6 +27,9 @@ Block::Block()
     width = 0;
     height = 0;
     side = 1;
+    repeat_x = 1.0;
+    repeat_y = 1.0;
+    hide = false;
 }
 
 Block::Block(float x, float y, float width, float height)
@@ -26,6 +41,7 @@ Block::Block(float x, float y, float width, float height)
     side = 1;
     repeat_x = 1.0;
     repeat_y = 1.0;
+    hide = false;
 }
 
 Block::Block(float x, float y, float width, float height, int side)
@@ -37,6 +53,19 @@ Block::Block(float x, float y, float width, float height, int side)
     Block::side = side;
     repeat_x = 1.0;
     repeat_y = 1.0;
+    hide = false;
+}
+
+Block::Block(float x, float y, float width, float height, int side, bool hide)
+{
+    Block::x = x;
+    Block::y = y;
+    Block::width = width;
+    Block::height = height;
+    Block::side = side;
+    repeat_x = 1.0;
+    repeat_y = 1.0;
+    Block::hide = hide;
 }
 
 Block::Block(float x, float y, float width, float height, int side, float repeat_x, float repeat_y)
@@ -48,6 +77,7 @@ Block::Block(float x, float y, float width, float height, int side, float repeat
     Block::side = side;
     Block::repeat_x = repeat_x;
     Block::repeat_y = repeat_y;
+    hide = false;
 }
 
 float Block::getX()
@@ -85,6 +115,11 @@ float Block::getRepeatY()
     return Block::repeat_y;
 }
 
+bool Block::getHide()
+{
+    return Block::hide;
+}
+
 void Block::setX(float x)
 {
     Block::x = x;
@@ -118,4 +153,9 @@ void Block::setRepeatX(float repeat_x)
 void Block::setRepeatY(float repeat_y)
 {
     Block::repeat_y = repeat_y;
+}
+
+void Block::setHide(bool hide)
+{
+    Block::hide = hide;
 }

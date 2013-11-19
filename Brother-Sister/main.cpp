@@ -6,6 +6,14 @@
 //  Copyright (c) 2013 Ceci & Jordan. All rights reserved.
 //
 
+/*
+ * TODO:    - CHECA QUE LOS PERSONAJES PASEN POR TODOS LOS SITIOS
+ *          - QUE SE PUEDAN PASAR LOS NIVELES
+ *          - AGREGAR LAS CUERDAS FALTANTES
+ *          - AGREGAR SONIDO
+ *          - AGREGAR ILUMINACION
+ */
+
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
@@ -42,6 +50,9 @@ Block goals[LISTS_COUNT][2];
 
 std::list<Block> spikes[LISTS_COUNT];
 unsigned long spikes_list_size[LISTS_COUNT];
+
+std::list<Block> ropes[LISTS_COUNT];
+unsigned long ropes_list_size[LISTS_COUNT];
 
 Button buttons[LISTS_COUNT];
 
@@ -101,25 +112,26 @@ static GLuint texturesBack[12];
  * 6 - Girl_Up_Right
  * 7 - Girl_Up_Left
  */
-static GLuint textures[5];
+static GLuint textures[6];
 
 int current_level = 0;
 
 GLint         window_width = 860
             , window_height = 575
-            , vertical_movement_speed = 1
-            , horizontal_movement_speed = 10
             , boy_side = character_init_pos[current_level][4]
-            , girl_side = character_init_pos[current_level][6];
+            , girl_side = character_init_pos[current_level][6]
+            , boy_movement = 0
+            , girl_movement = 0;
 
-GLfloat     vertical_movement_range = 3.0;
+GLfloat       vertical_movement_speed = 1.0
+            , horizontal_movement_speed = 2.0;
 
-GLboolean     vertical_movement_lock = false
-            , horizontal_movement_lock = false
-            , boy_move_down = (character_init_pos[current_level][5] == 0 ? true : false) //true
-            , girl_move_down = (character_init_pos[current_level][7] == 0 ? true : false)
-            , boy_vertical_move = false
-            , girl_vertical_move = false;
+GLboolean   //  vertical_movement_lock = false
+            //, horizontal_movement_lock = false
+              boy_move_down = (character_init_pos[current_level][5] == 0 ? true : false) //true
+            , girl_move_down = (character_init_pos[current_level][7] == 0 ? true : false);
+//            , boy_vertical_move = false
+//            , girl_vertical_move = false;
 
 
 /* PROTOTYPES */
@@ -134,8 +146,9 @@ Block frontListItem(std::list<Block>& list);
 void movement(int, int, int);
 void timeMoveHorizontalLeft(int);
 void timeMoveHorizontalRight(int);
-void timeMoveVertical(int);
+//void timeMoveVertical(int);
 void nextLevel();
+void movement(int);
 void resetLevel();
 void keyboard(unsigned char, int, int);
 void display();
@@ -307,14 +320,9 @@ bool characterIsFloating(Character _character, std::list<Block> list)
 
 bool checkGoalReached()
 {
-    std::cout << "BoyX: " << boy.getX() << std::endl;
-    std::cout << "BoyY: " << boy.getY() << std::endl;
-    std::cout << "GirlX: " << girl.getX() << std::endl;
-    std::cout << "GirlY: " << girl.getY() << std::endl;
-    
     return
-        (characterIsInside(boy, goals[current_level][0]) && !characterIsDown(boy, goals[current_level][0]) && !characterIsUp(boy, goals[current_level][0]) && !characterIsLeft(boy, goals[current_level][0]) && !characterIsRight(boy, goals[current_level][0]))
-        &&
+    (characterIsInside(boy, goals[current_level][0]) && !characterIsDown(boy, goals[current_level][0]) && !characterIsUp(boy, goals[current_level][0]) && !characterIsLeft(boy, goals[current_level][0]) && !characterIsRight(boy, goals[current_level][0]))
+    &&
     (characterIsInside(girl, goals[current_level][1]) && !characterIsDown(girl, goals[current_level][1]) && !characterIsUp(girl, goals[current_level][1]) && !characterIsLeft(girl, goals[current_level][1]) && !characterIsRight(girl, goals[current_level][1]));
 }
 
@@ -344,7 +352,7 @@ bool collisionLeft(Character _character, std::list<Block> list)
         
         if (characterIsRight(_character, _wall) && !characterIsDown(_character, _wall) && !characterIsUp(_character, _wall))
         {
-            if ((_character.getX() - 1) < (_wall.getX() + _wall.getWidth()))
+            if ((_character.getX() - horizontal_movement_speed) < (_wall.getX() + _wall.getWidth()))
             {
                 return true;
             }
@@ -365,7 +373,7 @@ bool collisionRight(Character _character, std::list<Block> list)
         
         if (characterIsLeft(_character, _wall) && !characterIsDown(_character, _wall) && !characterIsUp(_character, _wall))
         {
-            if ((_character.getX() + _character.getWidth() + 1) > _wall.getX())
+            if ((_character.getX() + _character.getWidth() + horizontal_movement_speed) > _wall.getX())
             {
                 return true;
             }
@@ -386,7 +394,7 @@ float collisionTop(Character _character, std::list<Block> list)
         
         if (characterIsDown(_character, _wall) && !characterIsLeft(_character, _wall) && !characterIsRight(_character, _wall))
         {
-            if ((_character.getY() + _character.getHeight() + vertical_movement_range) >= _wall.getY())
+            if ((_character.getY() + _character.getHeight() + vertical_movement_speed) >= _wall.getY())
             {
                 return abs((_character.getY() + _character.getHeight()) - _wall.getY());
             }
@@ -407,7 +415,7 @@ float collisionBottom(Character _character, std::list<Block> list)
         
         if (characterIsUp(_character, _wall) && !characterIsLeft(_character, _wall) && !characterIsRight(_character, _wall))
         {
-            if ( (_character.getY() - vertical_movement_range) <= (_wall.getY() + _wall.getHeight()) )
+            if ( (_character.getY() - vertical_movement_speed) <= (_wall.getY() + _wall.getHeight()) )
             {
                 return abs((_wall.getY() + _wall.getHeight()) - _character.getY());
             }
@@ -419,13 +427,29 @@ float collisionBottom(Character _character, std::list<Block> list)
     return -1.0f;
 }
 
-bool collisionSpikes(Character _character, std::list<Block> list)
+bool collisionObject(Character _character, std::list<Block> list)
 {
     return
-        (collisionTop(_character, list) <= 0 ? false : true)
-        || collisionRight(_character, list)
-        || (collisionBottom(_character, list) <= 0 ? false : true)
-        || collisionLeft(_character, list);
+    (collisionTop(_character, list) <= 0 ? false : true)
+    || collisionRight(_character, list)
+    || (collisionBottom(_character, list) <= 0 ? false : true)
+    || collisionLeft(_character, list);
+}
+
+bool collisionSpikes(Character _character, std::list<Block> list)
+{
+    std::list<Block> temp;
+    
+    for (int x = 0; x < list.size(); x++)
+    {
+        if (!frontListItem(list).getHide() || (frontListItem(list).getHide() && !buttons[current_level].isActive()))
+        {
+            temp.push_back(frontListItem(list));
+        }
+        nextListItem(list);
+    }
+    
+    return collisionObject(_character, temp);
 }
 
 bool collisionButton(Character _character, Button button)
@@ -433,10 +457,12 @@ bool collisionButton(Character _character, Button button)
     std::list<Block> temp;
     temp.push_back(Block(button.getX(), button.getY(), button.getWidth(), button.getHeight()));
     
-    return (collisionTop(_character, temp) <= 0 ? false : true)
-    || collisionRight(_character, temp)
-    || (collisionBottom(_character, temp) <= 0 ? false : true)
-    || collisionLeft(_character, temp);
+    return collisionObject(_character, temp);
+}
+
+bool collisionRopes(Character _character, std::list<Block> list)
+{
+    return collisionObject(_character, list);
 }
 
 /***************************************************************************
@@ -457,37 +483,69 @@ bool collisionButton(Character _character, Button button)
  ***************************************************************************/
 
 void moveCharactersFloating() {
-    if (characterIsFloating(boy, walls[current_level]) && characterIsFloating(girl, walls[current_level]))
-    {
-        if (!vertical_movement_lock)
+    //if (characterIsFloating(boy, walls[current_level]) && characterIsFloating(girl, walls[current_level]))
+    //{
+        /*if (!vertical_movement_lock)
         {
             vertical_movement_lock = true;
             boy_vertical_move = !boy_vertical_move;
             girl_vertical_move = !girl_vertical_move;
             glutTimerFunc(vertical_movement_speed,timeMoveVertical, 1);
-        }
-    }
-    else if (characterIsFloating(boy, walls[current_level]))
+        }*/
+    //}
+    /*else*/ if (characterIsFloating(boy, walls[current_level]))
     {
-        if (!vertical_movement_lock)
+        if (boy_movement == 7 && !boy_move_down)
+        {
+            boy_movement = 8;
+        }
+        else if (boy_movement == 7 && boy_move_down)
+        {
+            boy_movement = 6;
+        }
+        else if (boy_movement == 3 && !boy_move_down)
+        {
+            boy_movement = 2;
+        }
+        else if (boy_movement == 3 && boy_move_down)
+        {
+            boy_movement = 4;
+        }
+        /*if (!vertical_movement_lock)
         {
             vertical_movement_lock = true;
             boy_vertical_move = !boy_vertical_move;
             glutTimerFunc(vertical_movement_speed,timeMoveVertical, 1);
-        }
+        }*/
     }
-    else if (characterIsFloating(girl, walls[current_level]))
+    /*else*/ if (characterIsFloating(girl, walls[current_level]))
     {
-        if (!vertical_movement_lock)
+        if (girl_movement == 7 && !girl_move_down)
+        {
+            girl_movement = 8;
+        }
+        else if (girl_movement == 7 && girl_move_down)
+        {
+            girl_movement = 6;
+        }
+        else if (girl_movement == 3 && !girl_move_down)
+        {
+            girl_movement = 2;
+        }
+        else if (girl_movement == 3 && girl_move_down)
+        {
+            girl_movement = 4;
+        }
+        /*if (!vertical_movement_lock)
         {
             vertical_movement_lock = true;
             girl_vertical_move = !girl_vertical_move;
             glutTimerFunc(vertical_movement_speed,timeMoveVertical, 1);
-        }
+        }*/
     }
 }
 
-void timeMoveHorizontalRight(int v)
+/*void timeMoveHorizontalRight(int v)
 {
     if (v >= 0)
     {
@@ -571,9 +629,9 @@ void timeMoveHorizontalLeft(int v)
     {
         horizontal_movement_lock = false;
     }
-}
+}*/
 
-void timeMoveVertical(int v)
+/*void timeMoveVertical(int v)
 {
     if (boy_vertical_move) //si se debe de mover el niño
     {
@@ -607,6 +665,11 @@ void timeMoveVertical(int v)
                     if ( collisionButton(boy, buttons[current_level]) )
                     {
                         buttons[current_level].setActive(true);
+                    }
+                    
+                    if (collisionRopes(boy, ropes[current_level]))
+                    {
+                        boy_move_down = !boy_move_down;
                     }
                     
                     glutPostRedisplay();
@@ -671,6 +734,11 @@ void timeMoveVertical(int v)
                     if ( collisionButton(boy, buttons[current_level]) )
                     {
                         buttons[current_level].setActive(true);
+                    }
+                    
+                    if (collisionRopes(boy, ropes[current_level]))
+                    {
+                        boy_move_down = !boy_move_down;
                     }
                     
                     glutPostRedisplay();
@@ -743,6 +811,11 @@ void timeMoveVertical(int v)
                         buttons[current_level].setActive(true);
                     }
                     
+                    if (collisionRopes(girl, ropes[current_level]))
+                    {
+                        girl_move_down = !girl_move_down;
+                    }
+                    
                     glutPostRedisplay();
                     glutTimerFunc(vertical_movement_speed,timeMoveVertical,1);
                 }
@@ -806,6 +879,11 @@ void timeMoveVertical(int v)
                         buttons[current_level].setActive(true);
                     }
                     
+                    if (collisionRopes(girl, ropes[current_level]))
+                    {
+                        girl_move_down = !girl_move_down;
+                    }
+                    
                     glutPostRedisplay();
                     glutTimerFunc(vertical_movement_speed,timeMoveVertical,1);
                 }
@@ -841,7 +919,7 @@ void timeMoveVertical(int v)
             }
         }
     }
-}
+}*/
 
 /***************************************************************************
  ******************            FIN DE MOVIMIENTOS          *****************
@@ -875,6 +953,7 @@ void keyboard(unsigned char key, int x, int y)
         {
             case 'z':
             case 'Z':
+                /*
                 if (!vertical_movement_lock)
                 {
                     vertical_movement_lock = true;
@@ -887,6 +966,79 @@ void keyboard(unsigned char key, int x, int y)
                     
                     glutTimerFunc(vertical_movement_speed,timeMoveVertical, 1);
                 }
+                 */
+                
+                //ERROR:
+                if ((boy_movement == 0 || boy_movement == 3 || boy_movement == 7)
+                    &&
+                    (girl_movement == 0 || girl_movement == 3 || girl_movement == 7))
+                {
+                    boy_move_down = !boy_move_down;
+                    girl_move_down = !girl_move_down;
+                    
+                    if (boy_move_down)
+                    {
+                        if (boy_movement == 7)
+                        {
+                            boy_movement = 6;
+                        }
+                        else if (boy_movement == 3)
+                        {
+                            boy_movement = 4;
+                        }
+                        else if (boy_movement == 0)
+                        {
+                            boy_movement = 5;
+                        }
+                    }
+                    else
+                    {
+                        if (boy_movement == 7)
+                        {
+                            boy_movement = 8;
+                        }
+                        else if (boy_movement == 3)
+                        {
+                            boy_movement = 2;
+                        }
+                        else if (boy_movement == 0)
+                        {
+                            boy_movement = 1;
+                        }
+                    }
+                    
+                    if (girl_move_down)
+                    {
+                        if (girl_movement == 7)
+                        {
+                            girl_movement = 6;
+                        }
+                        else if (girl_movement == 3)
+                        {
+                            girl_movement = 4;
+                        }
+                        else if (girl_movement == 0)
+                        {
+                            girl_movement = 5;
+                        }
+                    }
+                    else
+                    {
+                        if (girl_movement == 7)
+                        {
+                            girl_movement = 8;
+                        }
+                        else if (girl_movement == 3)
+                        {
+                            girl_movement = 2;
+                        }
+                        else if (girl_movement == 0)
+                        {
+                            girl_movement = 1;
+                        }
+                    }
+                }
+                
                 break;
             case 'n':
             case 'N':
@@ -904,27 +1056,135 @@ void keyboard(unsigned char key, int x, int y)
     }
 }
 
-void movement(int key, int x, int y)
+void specKey(int key, int x, int y)
 {
-    if (!horizontal_movement_lock)
+    if (current_level != 0 && current_level < LISTS_COUNT - 1)
     {
-        if (current_level != 0 && current_level < LISTS_COUNT - 1)
+        if (GLUT_KEY_LEFT == key)
         {
-            if (GLUT_KEY_LEFT == key)
+            //BOY
+            if (boy_movement == 0)
             {
-                horizontal_movement_lock = true;
-                boy_side = 1;
-                girl_side = 0;
-                glutTimerFunc(horizontal_movement_speed,timeMoveHorizontalLeft,10);
-                glutPostRedisplay();
+                boy_movement = 7;
             }
-            else if (GLUT_KEY_RIGHT == key)
+            else if (boy_movement == 5)
             {
-                boy_side = 0;
-                girl_side = 1;
-                horizontal_movement_lock = true;
-                glutTimerFunc(horizontal_movement_speed, timeMoveHorizontalRight, 10);
-                glutPostRedisplay();
+                boy_movement = 6;
+            }
+            else if (boy_movement == 1)
+            {
+                boy_movement = 8;
+            }
+            
+            //GIRL
+            if (girl_movement == 0)
+            {
+                girl_movement = 3;
+            }
+            else if (girl_movement == 5)
+            {
+                girl_movement = 4;
+            }
+            else if (girl_movement == 1)
+            {
+                girl_movement = 2;
+            }
+        }
+        else if (GLUT_KEY_RIGHT == key)
+        {
+            //BOY
+            if (boy_movement == 0)
+            {
+                boy_movement = 3;
+            }
+            else if (boy_movement == 5)
+            {
+                boy_movement = 4;
+            }
+            else if (boy_movement == 1)
+            {
+                boy_movement = 2;
+            }
+            
+            //GIRL
+            if (girl_movement == 0)
+            {
+                girl_movement = 7;
+            }
+            else if (girl_movement == 5)
+            {
+                girl_movement = 6;
+            }
+            else if (girl_movement == 1)
+            {
+                girl_movement = 8;
+            }
+        }
+    }
+}
+
+void specKeyUp(int key, int x, int y)
+{
+    if (current_level != 0 && current_level < LISTS_COUNT - 1)
+    {
+        if (GLUT_KEY_LEFT == key)
+        {
+            //BOY
+            if (boy_movement == 7)
+            {
+                boy_movement = 0;
+            }
+            else if (boy_movement == 6)
+            {
+                boy_movement = 5;
+            }
+            else if (boy_movement == 8)
+            {
+                boy_movement = 1;
+            }
+            
+            //GIRL
+            if (girl_movement == 3)
+            {
+                girl_movement = 0;
+            }
+            else if (girl_movement == 4)
+            {
+                girl_movement = 5;
+            }
+            else if (girl_movement == 2)
+            {
+                girl_movement = 1;
+            }
+        }
+        else if (GLUT_KEY_RIGHT == key)
+        {
+            //BOY
+            if (boy_movement == 3)
+            {
+                boy_movement = 0;
+            }
+            else if (boy_movement == 4)
+            {
+                boy_movement = 5;
+            }
+            else if (boy_movement == 2)
+            {
+                boy_movement = 1;
+            }
+            
+            //GIRL
+            if (girl_movement == 7)
+            {
+                girl_movement = 0;
+            }
+            else if (girl_movement == 6)
+            {
+                girl_movement = 5;
+            }
+            else if (girl_movement == 8)
+            {
+                girl_movement = 1;
             }
         }
     }
@@ -934,6 +1194,12 @@ void nextLevel()
 {
     current_level++;
     (current_level > 10 ? current_level = 0 : 0);
+    
+    if (current_level > 0 && current_level < 10)
+    {
+        glutTimerFunc(1, movement, 1);
+    }
+    
     addMenu();
     resetLevel();
 }
@@ -957,11 +1223,14 @@ void changeLevel(int level)
 
 void resetLevel()
 {
-    vertical_movement_lock = false;
-    horizontal_movement_lock = false;
+    //vertical_movement_lock = false;
+    //horizontal_movement_lock = false;
     
-    boy_vertical_move = false;
-    girl_vertical_move = false;
+    //boy_vertical_move = false;
+    //girl_vertical_move = false;
+    
+    boy_movement = 0;
+    girl_movement = 0;
     
     boy_move_down = (character_init_pos[current_level][5] == 0 ? true : false);
     girl_move_down = (character_init_pos[current_level][7] == 0 ? true : false);
@@ -1211,7 +1480,10 @@ void drawSpikes(std::list<Block> list)
 {
     for (unsigned long x = 0; x < list.size(); x++)
     {
-        paintWall(frontListItem(list), 2);
+        if (!frontListItem(list).getHide() || (frontListItem(list).getHide() && !buttons[current_level].isActive()))
+        {
+            paintWall(frontListItem(list), 2);
+        }
         nextListItem(list);
     }
     
@@ -1326,6 +1598,15 @@ void drawButtonDoors(Button button)
     }
 }
 
+void drawRopes(std::list<Block> list)
+{
+    for (unsigned long x = 0; x < list.size(); x++)
+    {
+        paintWall(frontListItem(list), 5);
+        nextListItem(list);
+    }
+}
+
 void drawGoals()
 {
     glChangeColorHEX(0, 0, 255);
@@ -1363,13 +1644,15 @@ void display()
     
     drawCharacters();
     
-   // drawWalls(walls[current_level]);
+    drawWalls(walls[current_level]);
     
     drawSpikes(spikes[current_level]);
     
     drawButtonDoors(buttons[current_level]);
     
-   // drawGoals();
+    drawRopes(ropes[current_level]);
+    
+    //drawGoals();
     
     glutSwapBuffers();
 }
@@ -1379,7 +1662,611 @@ void display()
  ******************             FIN DE PINTADO             *****************
  ***************************************************************************/
 
+void checkUp()
+{
+    moveCharactersFloating();
+    
+    if (checkGoalReached())
+    {
+        nextLevel();
+    }
+    else if ( collisionButton(boy, buttons[current_level]) || collisionButton(girl, buttons[current_level]) )
+    {
+        buttons[current_level].setActive(true);
+    }
+    else if (collisionSpikes(boy, spikes[current_level]) || collisionSpikes(girl, spikes[current_level]))
+    {
+        resetLevel();
+    }
+}
 
+void movement(int v)
+{
+    if (boy_movement == 0)
+    {
+        //NO SE DEBE DE MOVER
+    }
+    else if(boy_movement == 1) //TOP
+    {
+        float boy_diff_collision = collisionTop(boy, walls[current_level]);
+        
+        if (-1.0f == boy_diff_collision && !buttons[current_level].isActive())
+        {
+            boy_diff_collision = collisionTop(boy, buttons[current_level].getDoors());
+        }
+        
+        if (-1.0f == boy_diff_collision) //si no colisiona
+        {
+            boy.setY(boy.getY() + vertical_movement_speed);
+                
+            if (collisionRopes(boy, ropes[current_level]))
+            {
+                boy_move_down = !boy_move_down;
+            }
+        }
+        else //si colisiona
+        {
+            if (0.0f != boy_diff_collision)
+            {
+                boy.setY(boy.getY() + boy_diff_collision);
+            }
+            
+            if (boy_movement == 1)
+            {
+                boy_movement = 0;
+            }
+            else if (boy_movement == 8)
+            {
+                boy_movement = 7;
+            }
+            else if (boy_movement == 2)
+            {
+                boy_movement = 3;
+            }
+        }
+    }
+    else if(boy_movement == 2) //TOP-RIGHT
+    {
+        boy_side = 0;
+        
+        if (!collisionRight(boy, walls[current_level]) && (!collisionRight(boy, buttons[current_level].getDoors()) || buttons[current_level].isActive()) )
+        {
+            boy.setX(boy.getX() + horizontal_movement_speed);
+        }
+        
+        float boy_diff_collision = collisionTop(boy, walls[current_level]);
+        
+        if (-1.0f == boy_diff_collision && !buttons[current_level].isActive())
+        {
+            boy_diff_collision = collisionTop(boy, buttons[current_level].getDoors());
+        }
+        
+        if (-1.0f == boy_diff_collision) //si no colisiona
+        {
+            boy.setY(boy.getY() + vertical_movement_speed);
+            
+            if (collisionRopes(boy, ropes[current_level]))
+            {
+                boy_move_down = !boy_move_down;
+            }
+        }
+        else //si colisiona
+        {
+            if (0.0f != boy_diff_collision)
+            {
+                boy.setY(boy.getY() + boy_diff_collision);
+            }
+            
+            if (boy_movement == 1)
+            {
+                boy_movement = 0;
+            }
+            else if (boy_movement == 8)
+            {
+                boy_movement = 7;
+            }
+            else if (boy_movement == 2)
+            {
+                boy_movement = 3;
+            }
+        }
+        
+        checkUp();
+    }
+    else if (boy_movement == 3) //RIGHT
+    {
+        boy_side = 0;
+        
+        if (!collisionRight(boy, walls[current_level]) && (!collisionRight(boy, buttons[current_level].getDoors()) || buttons[current_level].isActive()) )
+        {
+            boy.setX(boy.getX() + horizontal_movement_speed);
+        }
+    }
+    else if(boy_movement == 4) //BOTTOM-RIGHT
+    {
+        boy_side = 0;
+        
+        if (!collisionRight(boy, walls[current_level]) && (!collisionRight(boy, buttons[current_level].getDoors()) || buttons[current_level].isActive()) )
+        {
+            boy.setX(boy.getX() + horizontal_movement_speed);
+        }
+        
+        float boy_diff_collision = collisionBottom(boy, walls[current_level]);
+        
+        if (-1.0f == boy_diff_collision && !buttons[current_level].isActive())
+        {
+            boy_diff_collision = collisionBottom(boy, buttons[current_level].getDoors());
+        }
+        
+        if (-1.0f == boy_diff_collision) //si no colisiona
+        {
+            boy.setY(boy.getY() - vertical_movement_speed);
+            
+            if (collisionRopes(boy, ropes[current_level]))
+            {
+                boy_move_down = !boy_move_down;
+            }
+        }
+        else //si colisiona
+        {
+            if (0.0f != boy_diff_collision)
+            {
+                boy.setY(boy.getY() - boy_diff_collision);
+            }
+            
+            if (boy_movement == 5)
+            {
+                boy_movement = 0;
+            }
+            else if (boy_movement == 6)
+            {
+                boy_movement = 7;
+            }
+            else if (boy_movement == 4)
+            {
+                boy_movement = 3;
+            }
+        }
+    }
+    else if(boy_movement == 5) //BOTTOM
+    {
+        float boy_diff_collision = collisionBottom(boy, walls[current_level]);
+        
+        if (-1.0f == boy_diff_collision && !buttons[current_level].isActive())
+        {
+            boy_diff_collision = collisionBottom(boy, buttons[current_level].getDoors());
+        }
+        
+        if (-1.0f == boy_diff_collision) //si no colisiona
+        {
+            boy.setY(boy.getY() - vertical_movement_speed);
+            
+            if (collisionRopes(boy, ropes[current_level]))
+            {
+                boy_move_down = !boy_move_down;
+            }
+        }
+        else //si colisiona
+        {
+            if (0.0f != boy_diff_collision)
+            {
+                boy.setY(boy.getY() - boy_diff_collision);
+            }
+            
+            if (boy_movement == 5)
+            {
+                boy_movement = 0;
+            }
+            else if (boy_movement == 6)
+            {
+                boy_movement = 7;
+            }
+            else if (boy_movement == 4)
+            {
+                boy_movement = 3;
+            }
+        }
+    }
+    else if(boy_movement == 6) //BOTTOM-LEFT
+    {
+        boy_side = 1;
+        
+        if (!collisionLeft(boy, walls[current_level]) && (!collisionLeft(boy, buttons[current_level].getDoors()) || buttons[current_level].isActive()))
+        {
+            boy.setX(boy.getX() - horizontal_movement_speed);
+        }
+        
+        float boy_diff_collision = collisionBottom(boy, walls[current_level]);
+        
+        if (-1.0f == boy_diff_collision && !buttons[current_level].isActive())
+        {
+            boy_diff_collision = collisionBottom(boy, buttons[current_level].getDoors());
+        }
+        
+        if (-1.0f == boy_diff_collision) //si no colisiona
+        {
+            boy.setY(boy.getY() - vertical_movement_speed);
+            
+            if (collisionRopes(boy, ropes[current_level]))
+            {
+                boy_move_down = !boy_move_down;
+            }
+        }
+        else //si colisiona
+        {
+            if (0.0f != boy_diff_collision)
+            {
+                boy.setY(boy.getY() - boy_diff_collision);
+            }
+            
+            if (boy_movement == 5)
+            {
+                boy_movement = 0;
+            }
+            else if (boy_movement == 6)
+            {
+                boy_movement = 7;
+            }
+            else if (boy_movement == 4)
+            {
+                boy_movement = 3;
+            }
+        }
+    }
+    else if (boy_movement == 7) //LEFT
+    {
+        boy_side = 1;
+        
+        if (!collisionLeft(boy, walls[current_level]) && (!collisionLeft(boy, buttons[current_level].getDoors()) || buttons[current_level].isActive()))
+        {
+            boy.setX(boy.getX() - horizontal_movement_speed);
+        }
+        
+        checkUp();
+    }
+    else if(boy_movement == 8) //TOP-LEFT
+    {
+        boy_side = 1;
+        
+        if (!collisionLeft(boy, walls[current_level]) && (!collisionLeft(boy, buttons[current_level].getDoors()) || buttons[current_level].isActive()))
+        {
+            boy.setX(boy.getX() - horizontal_movement_speed);
+        }
+        
+        float boy_diff_collision = collisionTop(boy, walls[current_level]);
+        
+        if (-1.0f == boy_diff_collision && !buttons[current_level].isActive())
+        {
+            boy_diff_collision = collisionTop(boy, buttons[current_level].getDoors());
+        }
+        
+        if (-1.0f == boy_diff_collision) //si no colisiona
+        {
+            boy.setY(boy.getY() + vertical_movement_speed);
+            
+            if (collisionRopes(boy, ropes[current_level]))
+            {
+                boy_move_down = !boy_move_down;
+            }
+        }
+        else //si colisiona
+        {
+            if (0.0f != boy_diff_collision)
+            {
+                boy.setY(boy.getY() + boy_diff_collision);
+            }
+            
+            if (boy_movement == 1)
+            {
+                boy_movement = 0;
+            }
+            else if (boy_movement == 8)
+            {
+                boy_movement = 7;
+            }
+            else if (boy_movement == 2)
+            {
+                boy_movement = 3;
+            }
+        }
+    }
+    
+    
+    // GIRL
+    if (girl_movement == 0)
+    {
+        //NO SE DEBE DE MOVER
+    }
+    else if(girl_movement == 1) //TOP
+    {
+        float girl_diff_collision = collisionTop(girl, walls[current_level]);
+        
+        if (-1.0f == girl_diff_collision && !buttons[current_level].isActive())
+        {
+            girl_diff_collision = collisionTop(girl, buttons[current_level].getDoors());
+        }
+        
+        if (-1.0f == girl_diff_collision) //si no colisiona
+        {
+            girl.setY(girl.getY() + vertical_movement_speed);
+            
+            if (collisionRopes(girl, ropes[current_level]))
+            {
+                girl_move_down = !girl_move_down;
+            }
+        }
+        else //si colisiona
+        {
+            if (0.0f != girl_diff_collision)
+            {
+                girl.setY(girl.getY() + girl_diff_collision);
+            }
+            
+            if (girl_movement == 1)
+            {
+                girl_movement = 0;
+            }
+            else if (girl_movement == 8)
+            {
+                girl_movement = 7;
+            }
+            else if (girl_movement == 2)
+            {
+                girl_movement = 3;
+            }
+        }
+    }
+    else if(girl_movement == 2) //TOP-RIGHT
+    {
+        girl_side = 0;
+        
+        if (!collisionRight(girl, walls[current_level]) && (!collisionRight(girl, buttons[current_level].getDoors()) || buttons[current_level].isActive()) )
+        {
+            girl.setX(girl.getX() + horizontal_movement_speed);
+        }
+        
+        float girl_diff_collision = collisionTop(girl, walls[current_level]);
+        
+        if (-1.0f == girl_diff_collision && !buttons[current_level].isActive())
+        {
+            girl_diff_collision = collisionTop(girl, buttons[current_level].getDoors());
+        }
+        
+        if (-1.0f == girl_diff_collision) //si no colisiona
+        {
+            girl.setY(girl.getY() + vertical_movement_speed);
+            
+            if (collisionRopes(girl, ropes[current_level]))
+            {
+                girl_move_down = !girl_move_down;
+            }
+        }
+        else //si colisiona
+        {
+            if (0.0f != girl_diff_collision)
+            {
+                girl.setY(girl.getY() + girl_diff_collision);
+            }
+            
+            if (girl_movement == 1)
+            {
+                girl_movement = 0;
+            }
+            else if (girl_movement == 8)
+            {
+                girl_movement = 7;
+            }
+            else if (girl_movement == 2)
+            {
+                girl_movement = 3;
+            }
+        }
+        
+        checkUp();
+    }
+    else if (girl_movement == 3) //RIGHT
+    {
+        girl_side = 0;
+        
+        if (!collisionRight(girl, walls[current_level]) && (!collisionRight(girl, buttons[current_level].getDoors()) || buttons[current_level].isActive()) )
+        {
+            girl.setX(girl.getX() + horizontal_movement_speed);
+        }
+    }
+    else if(girl_movement == 4) //BOTTOM-RIGHT
+    {
+        girl_side = 0;
+        
+        if (!collisionRight(girl, walls[current_level]) && (!collisionRight(girl, buttons[current_level].getDoors()) || buttons[current_level].isActive()) )
+        {
+            girl.setX(girl.getX() + horizontal_movement_speed);
+        }
+        
+        float girl_diff_collision = collisionBottom(girl, walls[current_level]);
+        
+        if (-1.0f == girl_diff_collision && !buttons[current_level].isActive())
+        {
+            girl_diff_collision = collisionBottom(girl, buttons[current_level].getDoors());
+        }
+        
+        if (-1.0f == girl_diff_collision) //si no colisiona
+        {
+            girl.setY(girl.getY() - vertical_movement_speed);
+            
+            if (collisionRopes(girl, ropes[current_level]))
+            {
+                girl_move_down = !girl_move_down;
+            }
+        }
+        else //si colisiona
+        {
+            if (0.0f != girl_diff_collision)
+            {
+                girl.setY(girl.getY() - girl_diff_collision);
+            }
+            
+            if (girl_movement == 5)
+            {
+                girl_movement = 0;
+            }
+            else if (girl_movement == 6)
+            {
+                girl_movement = 7;
+            }
+            else if (girl_movement == 4)
+            {
+                girl_movement = 3;
+            }
+        }
+    }
+    else if(girl_movement == 5) //BOTTOM
+    {
+        float girl_diff_collision = collisionBottom(girl, walls[current_level]);
+        
+        if (-1.0f == girl_diff_collision && !buttons[current_level].isActive())
+        {
+            girl_diff_collision = collisionBottom(girl, buttons[current_level].getDoors());
+        }
+        
+        if (-1.0f == girl_diff_collision) //si no colisiona
+        {
+            girl.setY(girl.getY() - vertical_movement_speed);
+            
+            if (collisionRopes(girl, ropes[current_level]))
+            {
+                girl_move_down = !girl_move_down;
+            }
+        }
+        else //si colisiona
+        {
+            if (0.0f != girl_diff_collision)
+            {
+                girl.setY(girl.getY() - girl_diff_collision);
+            }
+            
+            if (girl_movement == 5)
+            {
+                girl_movement = 0;
+            }
+            else if (girl_movement == 6)
+            {
+                girl_movement = 7;
+            }
+            else if (girl_movement == 4)
+            {
+                girl_movement = 3;
+            }
+        }
+    }
+    else if(girl_movement == 6) //BOTTOM-LEFT
+    {
+        girl_side = 1;
+        
+        if (!collisionLeft(girl, walls[current_level]) && (!collisionLeft(girl, buttons[current_level].getDoors()) || buttons[current_level].isActive()))
+        {
+            girl.setX(girl.getX() - horizontal_movement_speed);
+        }
+        
+        float girl_diff_collision = collisionBottom(girl, walls[current_level]);
+        
+        if (-1.0f == girl_diff_collision && !buttons[current_level].isActive())
+        {
+            girl_diff_collision = collisionBottom(girl, buttons[current_level].getDoors());
+        }
+        
+        if (-1.0f == girl_diff_collision) //si no colisiona
+        {
+            girl.setY(girl.getY() - vertical_movement_speed);
+            
+            if (collisionRopes(girl, ropes[current_level]))
+            {
+                girl_move_down = !girl_move_down;
+            }
+        }
+        else //si colisiona
+        {
+            if (0.0f != girl_diff_collision)
+            {
+                girl.setY(girl.getY() - girl_diff_collision);
+            }
+            
+            if (girl_movement == 5)
+            {
+                girl_movement = 0;
+            }
+            else if (girl_movement == 6)
+            {
+                girl_movement = 7;
+            }
+            else if (girl_movement == 4)
+            {
+                girl_movement = 3;
+            }
+        }
+    }
+    else if (girl_movement == 7) //LEFT
+    {
+        girl_side = 1;
+        
+        if (!collisionLeft(girl, walls[current_level]) && (!collisionLeft(girl, buttons[current_level].getDoors()) || buttons[current_level].isActive()))
+        {
+            girl.setX(girl.getX() - horizontal_movement_speed);
+        }
+        
+        checkUp();
+    }
+    else if(girl_movement == 8) //TOP-LEFT
+    {
+        girl_side = 1;
+        
+        if (!collisionLeft(girl, walls[current_level]) && (!collisionLeft(girl, buttons[current_level].getDoors()) || buttons[current_level].isActive()))
+        {
+            girl.setX(girl.getX() - horizontal_movement_speed);
+        }
+        
+        float girl_diff_collision = collisionTop(girl, walls[current_level]);
+        
+        if (-1.0f == girl_diff_collision && !buttons[current_level].isActive())
+        {
+            girl_diff_collision = collisionTop(girl, buttons[current_level].getDoors());
+        }
+        
+        if (-1.0f == girl_diff_collision) //si no colisiona
+        {
+            girl.setY(girl.getY() + vertical_movement_speed);
+            
+            if (collisionRopes(girl, ropes[current_level]))
+            {
+                girl_move_down = !girl_move_down;
+            }
+        }
+        else //si colisiona
+        {
+            if (0.0f != girl_diff_collision)
+            {
+                girl.setY(girl.getY() + girl_diff_collision);
+            }
+            
+            if (girl_movement == 1)
+            {
+                girl_movement = 0;
+            }
+            else if (girl_movement == 8)
+            {
+                girl_movement = 7;
+            }
+            else if (girl_movement == 2)
+            {
+                girl_movement = 3;
+            }
+        }
+    }
+    
+    checkUp();
+    
+    glutPostRedisplay();
+    glutTimerFunc(1, movement, 1);
+}
 
 
 
@@ -1423,7 +2310,7 @@ void initRendering()
     loadTexture(image, texturesBack, 11);
     
     /** OTRAS TEXTURAS **/
-    glGenTextures(5, textures); //Make room for our texture
+    glGenTextures(6, textures); //Make room for our texture
     image = loadBMP("images/character/boy.bmp");
     loadTexture(image, textures, 0);
     image = loadBMP("images/character/girl.bmp");
@@ -1434,6 +2321,8 @@ void initRendering()
     loadTexture(image, textures, 3);
     image = loadBMP("images/other/door.bmp");
     loadTexture(image, textures, 4);
+    image = loadBMP("images/other/rope.bmp");
+    loadTexture(image, textures, 5);
     
     delete image;
 }
@@ -1504,12 +2393,13 @@ void init()
      
     spikes[4].push_back(Block(442, 363, 16, 16, 1));
     spikes[4].push_back(Block(458, 363, 16, 16, 1));
+    //spikes[4].push_back(Block(458, 363, 16, 16, 1, true));
     
     spikes[4].push_back(Block(145, 363, 16, 16, 1));
     spikes[4].push_back(Block(161, 363, 16, 16, 1));
     
     spikes[4].push_back(Block(400, 470, 16, 16, 3));
-    spikes[4].push_back(Block(416, 470, 16, 16, 3));
+    //spikes[4].push_back(Block(416, 470, 16, 16, 3));
    
     spikes[4].push_back(Block(536, 470, 16, 16, 3));
     spikes[4].push_back(Block(552, 470, 16, 16, 3));
@@ -1675,8 +2565,8 @@ void init()
     walls[7].push_back(Block(571, 168, 41, 40));
     walls[7].push_back(Block(131, 106, 121, 297));
     
-    spikes[7].push_back(Block(96, 235, 16, 16, 1));
-    spikes[7].push_back(Block(112, 235, 16, 16, 1));
+    spikes[7].push_back(Block(96, 235, 16, 16, 1, true));
+    spikes[7].push_back(Block(112, 235, 16, 16, 1, true));
 
     spikes[7].push_back(Block(254, 15, 16, 16, 1));
     spikes[7].push_back(Block(270, 15, 16, 16, 1));
@@ -1691,8 +2581,9 @@ void init()
     spikes[7].push_back(Block(414, 15, 16, 16, 1));
 
     buttons[7] = Button(477, 422, 32, 8);
-    
     buttons[7].addDoor(Block(92, 194, 40, 41, 2, 1.0, 0.625));
+    
+    ropes[7].push_back(Block(252, 300, 179, 16, 1, 11.1875, 1.0));
     
     /** NIVEL 8 **/
     walls[8].push_back(Block(0, 0, 69, 577));
@@ -1856,6 +2747,11 @@ void init()
         spikes_list_size[x] = spikes[x].size();
     }
     
+    for (int x = 0; x < LISTS_COUNT; x++)
+    {
+        ropes_list_size[x] = ropes[x].size();
+    }
+    
     initRendering();
 }
 
@@ -1870,8 +2766,9 @@ int main(int argc, char **argv)
     glutDisplayFunc(display);
     //glutReshapeFunc(handleResize);
     glutMouseFunc(myMouseButton);
-    glutSpecialFunc(movement);
+    glutSpecialFunc(specKey);
     glutKeyboardFunc(keyboard);
+    glutSpecialUpFunc(specKeyUp);
     glutMainLoop();
     
     return 0;
