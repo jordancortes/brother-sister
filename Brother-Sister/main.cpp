@@ -16,8 +16,12 @@
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
 #else
 #include <GL/glut.h>
+#include <AL/al.h>
+#include <AL/alut.h>
 #endif
 
 #include <iostream>
@@ -29,6 +33,7 @@
 #include "Character.h"
 #include "Block.h"
 #include "Button.h"
+#include "Sound.h"
 
 /* GLOBAL VARIABLES */
 
@@ -108,7 +113,7 @@ const float character_init_pos[LISTS_COUNT][8] =
  * 10 - Congratulations
  * 11 - Instructions
  */
-static GLuint texturesBack[13];
+static GLuint texturesBack[21];
 
 /**
  * 0 - Boy_Down_Right
@@ -120,9 +125,16 @@ static GLuint texturesBack[13];
  * 6 - Girl_Up_Right
  * 7 - Girl_Up_Left
  */
-static GLuint textures[7];
+static GLuint textures[16];
 
 int current_level = 0;
+int score = 0;
+
+/* SONIDO */
+static Sound* backgroundMusic;
+bool soundActive = true;
+ALCdevice *alDevice = NULL;
+ALCcontext *alContext = NULL;
 
 GLint         window_width = 860
             , window_height = 575
@@ -168,6 +180,33 @@ void addMenu();
 void init();
 void drawBanner(int);
 void changeLevel(int);
+
+/*
+ ********** FUNCION *********
+ * Escribe un texto en la pantalla
+ *
+ ******** PARAMETROS ********
+ * text - std::string - texto a ser mostrado
+ * x    - double      - posicion horizontal
+ * y    - double      - posicion vertical
+ * font - void *      - tipo de letra
+ *
+ ****** TIPO DE LETRAS ******
+ * GLUT_BITMAP_8_BY_13
+ * GLUT_BITMAP_9_BY_15
+ * GLUT_BITMAP_TIMES_ROMAN_10
+ * GLUT_BITMAP_TIMES_ROMAN_24
+ * GLUT_BITMAP_HELVETICA_10
+ * GLUT_BITMAP_HELVETICA_12
+ * GLUT_BITMAP_HELVETICA_18
+ *
+ */
+void glWriteText(std::string text, double x, double y, void * font) {
+    glRasterPos2f(x, y);
+    
+    for (std::string::iterator i = text.begin(); i != text.end(); ++i)
+        glutBitmapCharacter(font, *i);
+}
 
 /*
  ********** FUNCION *********
@@ -497,17 +536,7 @@ bool collisionRopes(Character _character, std::list<Block> list)
  ***************************************************************************/
 
 void moveCharactersFloating() {
-    //if (characterIsFloating(boy, walls[current_level]) && characterIsFloating(girl, walls[current_level]))
-    //{
-        /*if (!vertical_movement_lock)
-        {
-            vertical_movement_lock = true;
-            boy_vertical_move = !boy_vertical_move;
-            girl_vertical_move = !girl_vertical_move;
-            glutTimerFunc(vertical_movement_speed,timeMoveVertical, 1);
-        }*/
-    //}
-    /*else*/ if (characterIsFloating(boy, walls[current_level]))
+    if (characterIsFloating(boy, walls[current_level]))
     {
         if (boy_movement == 7 && !boy_move_down)
         {
@@ -525,14 +554,9 @@ void moveCharactersFloating() {
         {
             boy_movement = 4;
         }
-        /*if (!vertical_movement_lock)
-        {
-            vertical_movement_lock = true;
-            boy_vertical_move = !boy_vertical_move;
-            glutTimerFunc(vertical_movement_speed,timeMoveVertical, 1);
-        }*/
     }
-    /*else*/ if (characterIsFloating(girl, walls[current_level]))
+    
+    if (characterIsFloating(girl, walls[current_level]))
     {
         if (girl_movement == 7 && !girl_move_down)
         {
@@ -550,390 +574,8 @@ void moveCharactersFloating() {
         {
             girl_movement = 4;
         }
-        /*if (!vertical_movement_lock)
-        {
-            vertical_movement_lock = true;
-            girl_vertical_move = !girl_vertical_move;
-            glutTimerFunc(vertical_movement_speed,timeMoveVertical, 1);
-        }*/
     }
 }
-
-/*void timeMoveHorizontalRight(int v)
-{
-    if (v >= 0)
-    {
-        if (!collisionRight(boy, walls[current_level]) && (!collisionRight(boy, buttons[current_level].getDoors()) || buttons[current_level].isActive()) )
-        {
-            boy.setX(boy.getX() + 1);
-        }
-        if (!collisionLeft(girl, walls[current_level]) && (!collisionLeft(girl, buttons[current_level].getDoors()) || buttons[current_level].isActive()))
-        {
-            girl.setX(girl.getX() - 1);
-        }
-        
-        moveCharactersFloating();
-        
-        if (checkGoalReached())
-        {
-            nextLevel();
-            glutPostRedisplay();
-        }
-        else if ( collisionButton(boy, buttons[current_level]) || collisionButton(girl, buttons[current_level]) )
-        {
-            buttons[current_level].setActive(true);
-            horizontal_movement_lock = false;
-            glutPostRedisplay();
-        }
-        else if (collisionSpikes(boy, spikes[current_level]) || collisionSpikes(girl, spikes[current_level]))
-        {
-            resetLevel();
-            glutPostRedisplay();
-        }
-        else
-        {
-            glutPostRedisplay();
-            glutTimerFunc(horizontal_movement_speed, timeMoveHorizontalRight, --v);
-        }
-    }
-    else
-    {
-        horizontal_movement_lock = false;
-    }
-}
-
-void timeMoveHorizontalLeft(int v)
-{
-    if (v >= 0)
-    {
-        if (!collisionLeft(boy, walls[current_level]) && (!collisionLeft(boy, buttons[current_level].getDoors()) || buttons[current_level].isActive()))
-        {
-            boy.setX(boy.getX() - 1);
-        }
-        if (!collisionRight(girl, walls[current_level]) && (!collisionRight(girl, buttons[current_level].getDoors()) || buttons[current_level].isActive()))
-        {
-            girl.setX(girl.getX() + 1);
-        }
-        
-        moveCharactersFloating();
-        
-        if (checkGoalReached())
-        {
-            nextLevel();
-            glutPostRedisplay();
-        }
-        else if ( collisionButton(boy, buttons[current_level]) || collisionButton(girl, buttons[current_level]) )
-        {
-            buttons[current_level].setActive(true);
-            horizontal_movement_lock = false;
-            glutPostRedisplay();
-        }
-        else if (collisionSpikes(boy, spikes[current_level]) || collisionSpikes(girl, spikes[current_level]))
-        {
-            resetLevel();
-            glutPostRedisplay();
-        }
-        else
-        {
-            glutPostRedisplay();
-            glutTimerFunc(horizontal_movement_speed, timeMoveHorizontalLeft, --v);
-        }
-    }
-    else
-    {
-        horizontal_movement_lock = false;
-    }
-}*/
-
-/*void timeMoveVertical(int v)
-{
-    if (boy_vertical_move) //si se debe de mover el niño
-    {
-        float boy_diff_collision;
-        
-        if (!boy_move_down) //si va para arriba
-        {
-            boy_diff_collision = collisionTop(boy, walls[current_level]);
-            
-            if (-1.0f == boy_diff_collision && !buttons[current_level].isActive())
-            {
-                boy_diff_collision = collisionTop(boy, buttons[current_level].getDoors());
-            }
-            
-            if (-1.0f == boy_diff_collision) //si no colisiona
-            {
-                boy.setY(boy.getY() + vertical_movement_range);
-                
-                if (checkGoalReached())
-                {
-                    nextLevel();
-                    glutPostRedisplay();
-                }
-                else if ( collisionSpikes(boy, spikes[current_level]) )
-                {
-                    resetLevel();
-                    glutPostRedisplay();
-                }
-                else
-                {
-                    if ( collisionButton(boy, buttons[current_level]) )
-                    {
-                        buttons[current_level].setActive(true);
-                    }
-                    
-                    if (collisionRopes(boy, ropes[current_level]))
-                    {
-                        boy_move_down = !boy_move_down;
-                    }
-                    
-                    glutPostRedisplay();
-                    glutTimerFunc(vertical_movement_speed,timeMoveVertical,1);
-                }
-            }
-            else //si colisiona
-            {
-                if (0.0f != boy_diff_collision)
-                {
-                    boy.setY(boy.getY() + boy_diff_collision);
-                }
-                
-                boy_vertical_move = false;
-                if (!girl_vertical_move)
-                {
-                    vertical_movement_lock = false;
-                }
-                
-                if (checkGoalReached())
-                {
-                    nextLevel();
-                }
-                else if ( collisionButton(boy, buttons[current_level]) )
-                {
-                    buttons[current_level].setActive(true);
-                }
-                else if ( collisionSpikes(boy, spikes[current_level]) )
-                {
-                    resetLevel();
-                    glutPostRedisplay();
-                }
-                
-                glutPostRedisplay();
-            }
-        }
-        else //si va para abajo
-        {
-            boy_diff_collision = collisionBottom(boy, walls[current_level]);
-            
-            if (-1.0f == boy_diff_collision && !buttons[current_level].isActive())
-            {
-                boy_diff_collision = collisionBottom(boy , buttons[current_level].getDoors());
-            }
-            
-            if (-1.0f == boy_diff_collision)
-            {
-                boy.setY(boy.getY() - vertical_movement_range);
-                
-                if (checkGoalReached())
-                {
-                    nextLevel();
-                    glutPostRedisplay();
-                }
-                else if ( collisionSpikes(boy, spikes[current_level]) )
-                {
-                    resetLevel();
-                    glutPostRedisplay();
-                }
-                else
-                {
-                    if ( collisionButton(boy, buttons[current_level]) )
-                    {
-                        buttons[current_level].setActive(true);
-                    }
-                    
-                    if (collisionRopes(boy, ropes[current_level]))
-                    {
-                        boy_move_down = !boy_move_down;
-                    }
-                    
-                    glutPostRedisplay();
-                    glutTimerFunc(vertical_movement_speed,timeMoveVertical,1);
-                }
-            }
-            else
-            {
-                if (0.0f != boy_diff_collision)
-                {
-                    boy.setY(boy.getY() - boy_diff_collision);
-                }
-                
-                boy_vertical_move = false;
-                if (!girl_vertical_move)
-                {
-                    vertical_movement_lock = false;
-                }
-                
-                if (checkGoalReached())
-                {
-                    nextLevel();
-                }
-                else if ( collisionButton(boy, buttons[current_level]) )
-                {
-                    buttons[current_level].setActive(true);
-                }
-                else if ( collisionSpikes(boy, spikes[current_level]) )
-                {
-                    resetLevel();
-                    glutPostRedisplay();
-                }
-                
-                glutPostRedisplay();
-            }
-        }
-    }
-    
-    if (girl_vertical_move)  //si se debe de mover la niña
-    {
-        float girl_diff_collision;
-        
-        if (!girl_move_down) //si va para arriba
-        {
-            girl_diff_collision = collisionTop(girl, walls[current_level]);
-            
-            if (-1.0f == girl_diff_collision && !buttons[current_level].isActive())
-            {
-                girl_diff_collision = collisionTop(girl, buttons[current_level].getDoors());
-            }
-            
-            if (-1.0f == girl_diff_collision) //si no colisiona
-            {
-                girl.setY(girl.getY() + vertical_movement_range);
-                
-                if (checkGoalReached())
-                {
-                    nextLevel();
-                    glutPostRedisplay();
-                }
-                else if ( collisionSpikes(girl, spikes[current_level]) )
-                {
-                    resetLevel();
-                    glutPostRedisplay();
-                }
-                else
-                {
-                    if ( collisionButton(girl, buttons[current_level]) )
-                    {
-                        buttons[current_level].setActive(true);
-                    }
-                    
-                    if (collisionRopes(girl, ropes[current_level]))
-                    {
-                        girl_move_down = !girl_move_down;
-                    }
-                    
-                    glutPostRedisplay();
-                    glutTimerFunc(vertical_movement_speed,timeMoveVertical,1);
-                }
-            }
-            else //si colisiona
-            {
-                if (0.0f != girl_diff_collision)
-                {
-                    girl.setY(girl.getY() + girl_diff_collision);
-                }
-                
-                girl_vertical_move = false;
-                if (!boy_vertical_move)
-                {
-                    vertical_movement_lock = false;
-                }
-                
-                if (checkGoalReached())
-                {
-                    nextLevel();
-                }
-                else if ( collisionButton(girl, buttons[current_level]) )
-                {
-                    buttons[current_level].setActive(true);
-                }
-                else if ( collisionSpikes(girl, spikes[current_level]) )
-                {
-                    resetLevel();
-                    glutPostRedisplay();
-                }
-                
-                glutPostRedisplay();
-            }
-        }
-        else //si va para abajo
-        {
-            girl_diff_collision = collisionBottom(girl, walls[current_level]);
-            
-            if (-1.0f == girl_diff_collision && !buttons[current_level].isActive())
-            {
-                girl_diff_collision = collisionBottom(girl, buttons[current_level].getDoors());
-            }
-            
-            if (-1.0f == girl_diff_collision)
-            {
-                girl.setY(girl.getY() - vertical_movement_range);
-                if (checkGoalReached())
-                {
-                    nextLevel();
-                    glutPostRedisplay();
-                }
-                else if ( collisionSpikes(girl, spikes[current_level]) )
-                {
-                    resetLevel();
-                    glutPostRedisplay();
-                }
-                else
-                {
-                    if ( collisionButton(girl, buttons[current_level]) )
-                    {
-                        buttons[current_level].setActive(true);
-                    }
-                    
-                    if (collisionRopes(girl, ropes[current_level]))
-                    {
-                        girl_move_down = !girl_move_down;
-                    }
-                    
-                    glutPostRedisplay();
-                    glutTimerFunc(vertical_movement_speed,timeMoveVertical,1);
-                }
-            }
-            else
-            {
-                if (0.0f != girl_diff_collision)
-                {
-                    girl.setY(girl.getY() - girl_diff_collision);
-                }
-                
-                girl_vertical_move = false;
-                if (!boy_vertical_move)
-                {
-                    vertical_movement_lock = false;
-                }
-                
-                if (checkGoalReached())
-                {
-                    nextLevel();
-                }
-                else if ( collisionButton(girl, buttons[current_level]) )
-                {
-                    buttons[current_level].setActive(true);
-                }
-                else if ( collisionSpikes(girl, spikes[current_level]) )
-                {
-                    resetLevel();
-                    glutPostRedisplay();
-                }
-                
-                glutPostRedisplay();
-            }
-        }
-    }
-}*/
 
 /***************************************************************************
  ******************            FIN DE MOVIMIENTOS          *****************
@@ -967,26 +609,12 @@ void keyboard(unsigned char key, int x, int y)
         {
             case 'z':
             case 'Z':
-                /*
-                if (!vertical_movement_lock)
-                {
-                    vertical_movement_lock = true;
-                    
-                    boy_vertical_move = !boy_vertical_move;
-                    boy_move_down = !boy_move_down;
-                    
-                    girl_vertical_move = !girl_vertical_move;
-                    girl_move_down = !girl_move_down;
-                    
-                    glutTimerFunc(vertical_movement_speed,timeMoveVertical, 1);
-                }
-                 */
-                
-                //ERROR:
                 if ((boy_movement == 0 || boy_movement == 3 || boy_movement == 7)
                     &&
                     (girl_movement == 0 || girl_movement == 3 || girl_movement == 7))
                 {
+                    score++;
+                    
                     boy_move_down = !boy_move_down;
                     girl_move_down = !girl_move_down;
                     
@@ -1073,11 +701,8 @@ void keyboard(unsigned char key, int x, int y)
     {
         switch (key) {
             case ' ':
-                if (12 <= current_level)
-                {
-                    changeLevel(current_level - 11);
-                    rota_estrella = false;
-                }
+                changeLevel(current_level - 11);
+                rota_estrella = false;
                 break;
         }
     }
@@ -1089,6 +714,7 @@ void specKey(int key, int x, int y)
     {
         if (GLUT_KEY_LEFT == key)
         {
+            score++;
             //BOY
             if (boy_movement == 0)
             {
@@ -1119,6 +745,7 @@ void specKey(int key, int x, int y)
         }
         else if (GLUT_KEY_RIGHT == key)
         {
+            score++;
             //BOY
             if (boy_movement == 0)
             {
@@ -1240,9 +867,10 @@ void changeLevel(int level)
         glutDetachMenu(GLUT_RIGHT_BUTTON);
         glutDestroyMenu(1);
     }
-    else
+    else if (current_level > 0 && current_level < 10)
     {
         addMenu();
+        glutTimerFunc(1, movement, 1);
     }
     
     resetLevel();
@@ -1308,6 +936,7 @@ void myMouseButton(int button, int state, int mouseX, int mouseY)
             if (x >= 341 && x <= 518 && y >= 36 && y <= 95) // fin
             {
                 nextLevel();
+                score = 0;
             }
         }
     }
@@ -1330,6 +959,7 @@ void procesaMenu(int val)
     if (20 == val)
     {
         changeLevel(0);
+        score = 0;
     }
     else if (10 == val)
     {
@@ -1680,33 +1310,51 @@ void drawBackground()
 
 void drawBanner()
 {
-    float     width = 200.0
-            , height = 200.0
-            , x = 330.0
-            , y = 300.0;
+    float     star_width = 200.0
+            , star_height = 200.0
+            , star_x = 330.0
+            , star_y = 300.0
+            , number_height = 64.0
+            , number_width = 64.0
+            , number_x = 471.0
+            , number_y = 197.0;
     
     glEnable(GL_TEXTURE_2D);
     glMatrixMode(GL_MODELVIEW);
-
     glPushMatrix();
-    glColor3f(1.0, 1.0, 1.0);
-    glTranslatef(x+width/2, y+height/2, 0); // move back to focus of gluLookAt
+    glTranslatef(star_x+star_width/2, star_y+star_height/2, 0); // move back to focus of gluLookAt
     glRotatef(angulo_estrella, 0, 0, 1);
     glScalef(tamano_estrella/15, tamano_estrella/15, 1);
-    glTranslatef(-x-(width/2), -y-(height/2), 0); //move object to center
+    glTranslatef(-star_x-(star_width/2), -star_y-(star_height/2), 0); //move object to center
     glBindTexture(GL_TEXTURE_2D, textures[6]);
-    
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 0.0f);
-    glVertex2f(x, y);
+    glVertex2f(star_x, star_y);
     glTexCoord2f(1.0f, 0.0f);
-    glVertex2f(x+width, y);
+    glVertex2f(star_x+star_width, star_y);
     glTexCoord2f(1.0f, 1.0f);
-    glVertex2f(x+width, y+height);
+    glVertex2f(star_x+star_width, star_y+star_height);
     glTexCoord2f(0.0f, 1.0f);
-    glVertex2f(x, y+height);
+    glVertex2f(star_x, star_y+star_height);
     glEnd();
     glPopMatrix();
+    
+    
+    glPushMatrix();
+    glBindTexture(GL_TEXTURE_2D, textures[current_level - 5]);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex2f(number_x, number_y);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex2f(number_x + number_width, number_y);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex2f(number_x + number_width, number_y + number_height);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex2f(number_x, number_y + number_height);
+    glEnd();
+    glPopMatrix();
+    
+    glDisable(GL_TEXTURE_2D);
     
     angulo_estrella++;
     
@@ -1722,6 +1370,65 @@ void drawBanner()
     
     glutPostRedisplay();
     
+}
+
+template <typename T>
+std::string NumberToString ( T Number )
+{
+    std::ostringstream ss;
+    ss << Number;
+    return ss.str();
+}
+
+void drawScore()
+{
+    float   box_x = 8.0
+            , box_y = window_height - 38.0
+            , box_width = 100.0
+            , box_height = 25.0
+            , mat[4];
+    
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    
+    glPushMatrix();
+    
+    mat[0] = 0.24725;
+    mat[1] = 0.1995;
+    mat[2] = 0.0745;
+    mat[3] = 1.0;
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat);
+    mat[0] = 0.921568627;
+    mat[1] = 0.874509804;
+    mat[2] = 0.635294118;
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat);
+    mat[0] = 0.628281;
+    mat[1] = 0.555802;
+    mat[2] = 0.366065;
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat);
+    glMaterialf(GL_FRONT, GL_SHININESS, 0.4 * 128.0);
+    glBegin(GL_QUADS);
+    glVertex2f(box_x, box_y);
+    glVertex2f(box_x + box_width, box_y);
+    glVertex2f(box_x + box_width, box_y + box_height);
+    glVertex2f(box_x, box_y + box_height);
+    glEnd();
+    glPopMatrix();
+    
+    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHT0);
+    
+    //rgb(148, 17, 70)
+    glColor3f(0.580392157, 0.066666667, 0.274509804);
+    glWriteText("Score: " + NumberToString(score), 20.0, window_height - 31.0, GLUT_BITMAP_HELVETICA_18);
+    glColor3f(1.0, 1.0, 1.0);
+}
+
+void drawFinalScore()
+{
+    glColor3f(0.580392157, 0.066666667, 0.274509804);
+    glWriteText("Final Score: " + NumberToString(score), 370.0, 140.0, GLUT_BITMAP_HELVETICA_18);
+    glColor3f(1.0, 1.0, 1.0);
 }
 
 void display()
@@ -1744,6 +1451,19 @@ void display()
     {
         drawBanner();
     }
+    else if (current_level != 0 && current_level != 11 && current_level != 10)
+    {
+        drawScore();
+        
+        glFrontFace(GL_CW);
+        glEnable(GL_AUTO_NORMAL);
+        glEnable(GL_NORMALIZE);
+        glDepthFunc(GL_LESS);
+    }
+    else if (current_level == 10)
+    {
+        drawFinalScore();
+    }
     
     //drawGoals();
     
@@ -1761,7 +1481,15 @@ void checkUp()
     
     if (checkGoalReached())
     {
-        nextLevel();
+        if (9 == current_level)
+        {
+            nextLevel();
+        }
+        else
+        {
+            changeLevel(current_level + 12);
+            rota_estrella = true;
+        }
     }
     else if ( collisionButton(boy, buttons[current_level]) || collisionButton(girl, buttons[current_level]) )
     {
@@ -2675,7 +2403,7 @@ void initRendering()
     glEnable(GL_TEXTURE_2D);
     
     /** FONDOS **/
-    glGenTextures(13, texturesBack); //Make room for our texture
+    glGenTextures(21, texturesBack); //Make room for our texture
     
     image = loadBMP("images/background/inicio.bmp");
     loadTexture(image, texturesBack, 0);
@@ -2703,9 +2431,17 @@ void initRendering()
     loadTexture(image, texturesBack, 11);
     image = loadBMP("images/background/pasaNivel.bmp");
     loadTexture(image, texturesBack, 12);
+    loadTexture(image, texturesBack, 13);
+    loadTexture(image, texturesBack, 14);
+    loadTexture(image, texturesBack, 15);
+    loadTexture(image, texturesBack, 16);
+    loadTexture(image, texturesBack, 17);
+    loadTexture(image, texturesBack, 18);
+    loadTexture(image, texturesBack, 19);
+    loadTexture(image, texturesBack, 20);
     
     /** OTRAS TEXTURAS **/
-    glGenTextures(7, textures); //Make room for our texture
+    glGenTextures(16, textures); //Make room for our texture
     image = loadBMP("images/character/boy.bmp");
     loadTexture(image, textures, 0);
     image = loadBMP("images/character/girl.bmp");
@@ -2720,12 +2456,62 @@ void initRendering()
     loadTexture(image, textures, 5);
     image = loadBMP("images/other/star.bmp");
     loadTexture(image, textures, 6);
+    image = loadBMP("images/number/1.bmp");
+    loadTexture(image, textures, 7);
+    image = loadBMP("images/number/2.bmp");
+    loadTexture(image, textures, 8);
+    image = loadBMP("images/number/3.bmp");
+    loadTexture(image, textures, 9);
+    image = loadBMP("images/number/4.bmp");
+    loadTexture(image, textures, 10);
+    image = loadBMP("images/number/5.bmp");
+    loadTexture(image, textures, 11);
+    image = loadBMP("images/number/6.bmp");
+    loadTexture(image, textures, 12);
+    image = loadBMP("images/number/7.bmp");
+    loadTexture(image, textures, 13);
+    image = loadBMP("images/number/8.bmp");
+    loadTexture(image, textures, 14);
+    image = loadBMP("images/number/9.bmp");
+    loadTexture(image, textures, 15);
     
     delete image;
 }
 
 void init()
 {
+    //inicializa sonido
+    alDevice = alcOpenDevice(NULL);
+    if (!alDevice) {
+        std::cout << "No OpenAL Device" << std::endl;
+    }
+    else {
+        alContext = alcCreateContext(alDevice, NULL);
+        alcMakeContextCurrent(alContext);
+    }
+    
+    backgroundMusic = Sound::loadWave("audio/background.wav");
+    backgroundMusic->loop();
+    backgroundMusic->play();
+    
+    GLfloat ambient[] ={0.0, 0.0, 0.0, 1.0};
+    GLfloat diffuse[] ={1.0, 1.0, 1.0, 1.0};
+    GLfloat position[] ={0.0, 3.0, 3.0, 0.0};
+    
+    GLfloat lmodel_ambient[] ={0.2, 0.2, 0.2, 1.0};
+    GLfloat local_view[] ={0.0};
+    
+    /*glEnable (GL_BLEND);
+     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+     glEnable(GL_COLOR_MATERIAL);*/
+    
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+    glLightfv(GL_LIGHT0, GL_POSITION, position);
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
+    glLightModelfv(GL_LIGHT_MODEL_LOCAL_VIEWER, local_view);
+    
+    
     glChangeBackgroundColorHEX(100, 100, 100, 1.0);
     
     boy = Character(character_init_pos[current_level][0], character_init_pos[current_level][1], 40.0, 50.0);
@@ -3151,6 +2937,8 @@ void init()
     {
         ropes_list_size[x] = ropes[x].size();
     }
+    
+    
     
     initRendering();
 }

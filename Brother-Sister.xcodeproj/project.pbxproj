@@ -15,6 +15,8 @@
 		17358B241809EC9700DB4962 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 17358B221809EC9700DB4962 /* OpenGL.framework */; };
 		173B92C01828C5B0001382B4 /* ImageLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 173B92BF1828C5B0001382B4 /* ImageLoader.cpp */; };
 		175A2017180CDE880034C7EE /* Character.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 175A2015180CDE870034C7EE /* Character.cpp */; };
+		17E58015183C6D8400E854FB /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 17E58014183C6D8400E854FB /* OpenAL.framework */; };
+		17E58018183C6FDE00E854FB /* Sound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 17E58016183C6FDE00E854FB /* Sound.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -45,6 +47,10 @@
 		175A2015180CDE870034C7EE /* Character.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Character.cpp; sourceTree = "<group>"; };
 		175A2016180CDE880034C7EE /* Character.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Character.h; sourceTree = "<group>"; };
 		17B75591182890C100BC33E9 /* ImageLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageLoader.h; sourceTree = "<group>"; };
+		17E58014183C6D8400E854FB /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		17E58016183C6FDE00E854FB /* Sound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Sound.cpp; sourceTree = "<group>"; };
+		17E58017183C6FDE00E854FB /* Sound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sound.h; sourceTree = "<group>"; };
+		17E5801A183C79C300E854FB /* audio */ = {isa = PBXFileReference; lastKnownFileType = folder; path = audio; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +58,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				17E58015183C6D8400E854FB /* OpenAL.framework in Frameworks */,
 				17358B231809EC9700DB4962 /* GLUT.framework in Frameworks */,
 				17358B241809EC9700DB4962 /* OpenGL.framework in Frameworks */,
 			);
@@ -63,6 +70,7 @@
 		17358B0C1809E1E200DB4962 = {
 			isa = PBXGroup;
 			children = (
+				17E58014183C6D8400E854FB /* OpenAL.framework */,
 				17358B211809EC9700DB4962 /* GLUT.framework */,
 				17358B221809EC9700DB4962 /* OpenGL.framework */,
 				17358B171809E1E300DB4962 /* Brother-Sister */,
@@ -81,6 +89,7 @@
 		17358B171809E1E300DB4962 /* Brother-Sister */ = {
 			isa = PBXGroup;
 			children = (
+				17E5801A183C79C300E854FB /* audio */,
 				17408042183749270037B847 /* images */,
 				17358B181809E1E300DB4962 /* main.cpp */,
 				173B92BF1828C5B0001382B4 /* ImageLoader.cpp */,
@@ -92,6 +101,8 @@
 				170F6855182FD5780093C920 /* Block.h */,
 				170F686018300F330093C920 /* Button.cpp */,
 				170F686118300F330093C920 /* Button.h */,
+				17E58016183C6FDE00E854FB /* Sound.cpp */,
+				17E58017183C6FDE00E854FB /* Sound.h */,
 			);
 			path = "Brother-Sister";
 			sourceTree = "<group>";
@@ -152,6 +163,7 @@
 				173B92C01828C5B0001382B4 /* ImageLoader.cpp in Sources */,
 				175A2017180CDE880034C7EE /* Character.cpp in Sources */,
 				170F6856182FD5780093C920 /* Block.cpp in Sources */,
+				17E58018183C6FDE00E854FB /* Sound.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
