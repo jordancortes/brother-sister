@@ -47,7 +47,7 @@
  * 9 - Level 9
  * 10 - Level 10
  */
-const int LISTS_COUNT = 20;
+const int LISTS_COUNT = 21;
 std::list<Block> walls[LISTS_COUNT];
 unsigned long walls_list_size[LISTS_COUNT];
 
@@ -87,6 +87,7 @@ const float character_init_pos[LISTS_COUNT][8] =
     , {202, 403, 152, 435, 0, 0, 1, 1}
     , {694, 16, 100, 56, 0, 0, 1, 1}
     , {146, 66, 673, 66, 0, 0, 1, 0}
+    , {1000, 1000, 1000, 1000, 1, 0, 0, 1}
     , {1000, 1000, 1000, 1000, 1, 0, 0, 1}
     , {1000, 1000, 1000, 1000, 1, 0, 0, 1}
     , {1000, 1000, 1000, 1000, 1, 0, 0, 1}
